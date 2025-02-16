@@ -11,7 +11,7 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { RecipeKey, recipeKeys } from "../../../data/recipes";
+import { RecipeKey, recipeKeys } from "../../../data/brew";
 
 const itemEnum = z.enum(recipeKeys);
 const sellPriceSchema = z.object({

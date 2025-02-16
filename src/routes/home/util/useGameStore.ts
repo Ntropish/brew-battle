@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
-import { BrewSize, RecipeKey } from "../../../data/recipes";
+import { BrewSize, RecipeKey } from "../../../data/brew";
 import { EquipmentKey } from "../../../data/equipment";
 
 // const ingredientKeys = [

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { IngredientKey } from "./ingredients";
 
 // const ingredientKeys = [
@@ -11,21 +12,38 @@ import { IngredientKey } from "./ingredients";
 //     "st-john-wort",
 // ]
 
-export const brewKeys = [
+// export const brewKeys = [
+//   "healing-potion",
+//   "mana-potion",
+//   "strength-potion",
+//   "invisibility-potion",
+// ];
+
+export const brewKeySchema = z.enum([
   "healing-potion",
   "mana-potion",
   "strength-potion",
   "invisibility-potion",
-];
+]);
 
-type BrewKey = (typeof brewKeys)[number];
+export type BrewKey = z.infer<typeof brewKeySchema>;
 
-export type BrewSize = 2 | 4 | 8;
+// export type BrewSize = 2 | 4 | 8;
+
+export const brewSizeSchema = z.enum(["2", "4", "8"]);
+
+export type BrewSize = z.infer<typeof brewSizeSchema>;
 
 export const brewSizeNameMap: Record<BrewSize, string> = {
   2: "Small",
   4: "Medium",
   8: "Large",
+};
+
+export const brewSizeAbbreviationMap: Record<BrewSize, string> = {
+  2: "S",
+  4: "M",
+  8: "L",
 };
 
 export type Recipe = {

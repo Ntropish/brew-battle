@@ -16,8 +16,8 @@ import ItemTable, { ItemRow } from "./ItemTable";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import EquipmentTable, { EquipmentRow } from "./EquipmentTable";
 import { equipmentMap } from "../../../data/equipment";
-import BrewTable, { BrewRow } from "./BrewTable";
-import { recipeMap } from "../../../data/recipes";
+import BrewTable, { BrewRow } from "./brew/BrewTable";
+import { recipeMap } from "../../../data/brew";
 // This type should match the shape of your PotionShop from your Zustand store.
 
 interface ShopPanelProps {
@@ -69,6 +69,8 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
     return Object.entries(shop.inventory.brews).flatMap(([key, brew]) => {
       return Object.entries(brew).map(([size, count]) => ({
         key: `${key}-${size}`,
+        brewKey: key,
+        brewSize: size,
         size: Number(size),
         name: recipeMap[key].name,
         description: recipeMap[key].description,
