@@ -24,14 +24,17 @@ import { EquipmentKey } from "../../data/equipment";
 //   "invisibility-potion",
 // ];
 
+export type BrewSize = 1 | 2 | 3;
+
 export interface PotionShop {
   gold: number;
   inventory: {
     items: Record<ItemKey, number>;
     ingredients: Record<IngredientKey, number>;
+    brews: Record<RecipeKey, Record<BrewSize, number>>;
   };
   equipment: Record<EquipmentKey, number>;
-  sellPrices: Record<RecipeKey, number>;
+  sellPrices: Record<RecipeKey, Record<RecipeKey, number>>;
 }
 
 interface OrderIngredientArg {
@@ -96,6 +99,12 @@ const initialShop: PotionShop = {
       foxglove: 6,
       "st-john-wort": 7,
     },
+    brews: {
+      "healing-potion": { 1: 5, 2: 3, 3: 1 },
+      "mana-potion": { 1: 4, 2: 2, 3: 1 },
+      "strength-potion": { 1: 3, 2: 2, 3: 1 },
+      "invisibility-potion": { 1: 2, 2: 1, 3: 0 },
+    },
   },
   equipment: {
     cauldron: 0,
@@ -103,10 +112,10 @@ const initialShop: PotionShop = {
     "alchemy-table": 0,
   },
   sellPrices: {
-    "healing-potion": 75,
-    "mana-potion": 90,
-    "strength-potion": 120,
-    "invisibility-potion": 150,
+    "healing-potion": { 1: 15, 2: 40, 3: 100 },
+    "mana-potion": { 1: 20, 2: 50, 3: 120 },
+    "strength-potion": { 1: 25, 2: 60, 3: 150 },
+    "invisibility-potion": { 1: 30, 2: 70, 3: 180 },
   },
 };
 const useGameStore = create<GameStore>()((set) => ({

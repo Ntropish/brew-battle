@@ -30,7 +30,7 @@ type Recipe = {
   };
 };
 
-const recipeMap: Record<string, Recipe> = {
+export const recipeMap: Record<string, Recipe> = {
   "healing-potion": {
     name: "Healing Potion",
     description:

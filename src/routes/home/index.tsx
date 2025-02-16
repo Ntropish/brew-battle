@@ -45,18 +45,19 @@ export default function Home() {
   return (
     <Stack
       direction="column"
-      spacing={1}
+      spacing={0.1}
       sx={{
         flex: 1,
         minHeight: 0,
-        py: 1,
+        p: 0.1,
+        m: 0.1,
       }}
     >
       <Typography variant="h4" color="text.secondary">
         Home
       </Typography>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={0.1}>
         {/* Human player's shop */}
         <Grid
           size={{
@@ -68,16 +69,12 @@ export default function Home() {
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <ShopPanel title="Your Shop" shop={playerShop} />
-            <Box mt={4}>
-              <OrderIngredientForm onSubmit={handleOrderIngredient} />
-            </Box>
-            <Box mt={4}>
-              <SetSellPriceForm onSubmit={handleSetSellPrice} />
-            </Box>
-            <Box mt={4}>
-              <UpgradeEquipmentForm onSubmit={handleUpgradeEquipment} />
-            </Box>
+            <ShopPanel
+              title="Your Shop"
+              shop={playerShop}
+              canWrite
+              canReadInternal
+            />
           </motion.div>
         </Grid>
 
