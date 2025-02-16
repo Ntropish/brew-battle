@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { ConsumableKey, ItemKey } from "../../data/items";
+import { ItemKey } from "../../data/items";
 import { IngredientKey } from "../../data/ingredients";
 import { RecipeKey } from "../../data/recipes";
 import { EquipmentKey } from "../../data/equipment";
@@ -60,12 +60,15 @@ interface CustomerPurchaseArg {
 export interface GameStore {
   gameStartTime: number | null;
   stores: Record<string, PotionShop>;
-  ingredientPrices: Record<IngredientKey, number>;
+  ingredientCosts: Record<IngredientKey, number>;
+  itemCosts: Record<ItemKey, number>;
+  equipmentUpgradeCosts: Record<EquipmentKey, number>;
 
   startGame: () => void;
 
   // Market actions
   setIngredientPrices: (priceMap: Record<IngredientKey, number>) => void;
+  setItemPrices: (priceMap: Record<ItemKey, number>) => void;
   // Shopkeeper actions
   orderIngredient: (arg: OrderIngredientArg) => void;
   setSellPrice: (arg: setSellPriceArg) => void;
@@ -112,7 +115,7 @@ const useGameStore = create<GameStore>()((set) => ({
     player: initialShop,
     derris: initialShop,
   },
-  ingredientPrices: {
+  ingredientCosts: {
     "mandrake-root": 10,
     "nightshade-berries": 15,
     "valerian-root": 8,
@@ -123,23 +126,45 @@ const useGameStore = create<GameStore>()((set) => ({
     "st-john-wort": 6,
   },
 
+  itemCosts: {
+    "small-bottle": 5,
+    "medium-bottle": 10,
+    "large-bottle": 15,
+  },
+
+  equipmentUpgradeCosts: {
+    cauldron: 10,
+    "brewing-stand": 20,
+    "alchemy-table": 30,
+  },
+
   startGame: () => set({ gameStartTime: Date.now() }),
 
   setIngredientPrices: () => {
     set((state) => {
-      const prices = { ...state.ingredientPrices };
+      const prices = { ...state.ingredientCosts };
       for (const ingredient of Object.keys(prices)) {
         prices[ingredient as IngredientKey] =
           Math.floor(Math.random() * 10) + 1;
       }
-      return { ingredientPrices: prices };
+      return { ingredientCosts: prices };
+    });
+  },
+
+  setItemPrices: () => {
+    set((state) => {
+      const prices = { ...state.itemCosts };
+      for (const item of Object.keys(prices)) {
+        prices[item as ItemKey] = Math.floor(Math.random() * 10) + 1;
+      }
+      return { itemPrices: prices };
     });
   },
 
   orderIngredient: ({ keeper, ingredient, amount }) =>
     set((state) => {
       const shop = state.stores[keeper];
-      const price = state.ingredientPrices[ingredient] * amount;
+      const price = state.ingredientCosts[ingredient] * amount;
       return {
         stores: {
           ...state.stores,

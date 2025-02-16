@@ -4,7 +4,7 @@ type Consumable = {
   baseValue: number;
 };
 
-export const consumableMap: Record<string, Consumable> = {
+export const itemMap: Record<string, Consumable> = {
   "small-bottle": {
     name: "Small Bottle",
     description: "A small bottle for holding potions and liquids.",
@@ -22,6 +22,4 @@ export const consumableMap: Record<string, Consumable> = {
   },
 };
 
-export type ConsumableKey = keyof typeof consumableMap;
-
-export type ItemKey = ConsumableKey;
+export type ItemKey = keyof typeof itemMap;
