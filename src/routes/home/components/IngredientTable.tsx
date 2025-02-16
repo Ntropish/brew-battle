@@ -9,7 +9,7 @@ import { baseTableConfig } from "../util/materialReactTable";
 import { Button } from "@mui/material";
 import BuyButton from "./BuyButton";
 import OrderButton from "./OrderButton";
-import { addDays } from "date-fns";
+import { addDays, addMinutes } from "date-fns";
 
 export type IngredientRow = {
   name: string;
@@ -50,9 +50,9 @@ const InventoryTable = ({ data, canWrite }: InventoryTableProps) => {
 
   const getDiscount = (qty: number) => Math.ceil((qty - 1) / 10) * 0.2;
   const getDeliveryTime = (qty: number) => {
-    if (qty < 10) return addDays(new Date(), 1);
-    if (qty < 100) return addDays(new Date(), 3);
-    return addDays(new Date(), 7);
+    if (qty < 10) return addMinutes(new Date(), 1);
+    if (qty < 100) return addMinutes(new Date(), 3);
+    return addMinutes(new Date(), 7);
   };
 
   const tableConfig = useMemo(() => {
