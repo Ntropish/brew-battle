@@ -14,9 +14,10 @@ export type ItemRow = {
 
 type ItemTableProps = {
   data: ItemRow[];
+  canWrite?: boolean;
 };
 
-const ItemTable = ({ data }: ItemTableProps) => {
+const ItemTable = ({ data, canWrite }: ItemTableProps) => {
   const columns = useMemo<MRT_ColumnDef<ItemRow>[]>(
     () => [
       {
@@ -39,10 +40,13 @@ const ItemTable = ({ data }: ItemTableProps) => {
     columns,
     data: data,
     muiTableContainerProps: { sx: { maxHeight: "300px" } },
+    muiTablePaperProps: { elevation: 0 },
     enableTopToolbar: false,
     enablePagination: false,
     enableBottomToolbar: false,
     enableStickyHeader: true,
+    enableFilters: false,
+    enableColumnActions: false,
   });
 
   return <MaterialReactTable table={table} />;

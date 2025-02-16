@@ -8,7 +8,7 @@ import {
   AccordionSummary,
 } from "@mui/material";
 
-import useGameStore, { PotionShop } from "../useGameStore"; // Adjust the import based on your file structure
+import useGameStore, { PotionShop } from "../util/useGameStore"; // Adjust the import based on your file structure
 import IngredientTable, { IngredientRow } from "./IngredientTable";
 import { itemMap } from "../../../data/items";
 import { ingredientMap } from "../../../data/ingredients";
@@ -70,7 +70,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
       return Object.entries(brew).map(([size, count]) => ({
         key: `${key}-${size}`,
         size: Number(size),
-        name: `${recipeMap[key].name} Brew ${size}`,
+        name: recipeMap[key].name,
         description: recipeMap[key].description,
         count: Number(count),
         sellPrice: shop.sellPrices[key][size] || NaN,
@@ -80,7 +80,12 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
 
   return (
     <Paper sx={{ m: 0.1, p: 0.1 }}>
-      <Typography variant="h5" gutterBottom>
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{ textAlign: "center", fontWeight: 100 }}
+        color="textSecondary"
+      >
         {title}
       </Typography>
       {/* <Typography variant="subtitle1">Gold: {shop.gold}</Typography>
@@ -102,7 +107,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}
               >
-                <IngredientTable data={ingredientRows} />
+                <IngredientTable data={ingredientRows} canWrite={canWrite} />
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -116,7 +121,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}
               >
-                <ItemTable data={itemRows} />
+                <ItemTable data={itemRows} canWrite={canWrite} />
               </AccordionDetails>
             </Accordion>
             <Accordion>
@@ -144,8 +149,8 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
           >
             <Typography variant="h6">Brews</Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            <BrewTable data={brewRows} />
+          <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
+            <BrewTable data={brewRows} canWrite={canWrite} />
           </AccordionDetails>
         </Accordion>
       </Box>

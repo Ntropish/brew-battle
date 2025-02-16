@@ -1,8 +1,8 @@
 import { create } from "zustand";
-import { ItemKey } from "../../data/items";
-import { IngredientKey } from "../../data/ingredients";
-import { RecipeKey } from "../../data/recipes";
-import { EquipmentKey } from "../../data/equipment";
+import { ItemKey } from "../../../data/items";
+import { IngredientKey } from "../../../data/ingredients";
+import { BrewSize, RecipeKey } from "../../../data/recipes";
+import { EquipmentKey } from "../../../data/equipment";
 
 // const ingredientKeys = [
 //   "mandrake-root",
@@ -23,8 +23,6 @@ import { EquipmentKey } from "../../data/equipment";
 //   "strength-potion",
 //   "invisibility-potion",
 // ];
-
-export type BrewSize = 1 | 2 | 3;
 
 export interface PotionShop {
   gold: number;
@@ -100,10 +98,10 @@ const initialShop: PotionShop = {
       "st-john-wort": 7,
     },
     brews: {
-      "healing-potion": { 1: 5, 2: 3, 3: 1 },
-      "mana-potion": { 1: 4, 2: 2, 3: 1 },
-      "strength-potion": { 1: 3, 2: 2, 3: 1 },
-      "invisibility-potion": { 1: 2, 2: 1, 3: 0 },
+      "healing-potion": { 2: 5, 4: 3, 8: 1 },
+      "mana-potion": { 2: 4, 4: 2, 8: 1 },
+      "strength-potion": { 2: 3, 4: 2, 8: 1 },
+      "invisibility-potion": { 2: 2, 4: 1, 8: 0 },
     },
   },
   equipment: {
@@ -112,12 +110,13 @@ const initialShop: PotionShop = {
     "alchemy-table": 0,
   },
   sellPrices: {
-    "healing-potion": { 1: 15, 2: 40, 3: 100 },
-    "mana-potion": { 1: 20, 2: 50, 3: 120 },
-    "strength-potion": { 1: 25, 2: 60, 3: 150 },
-    "invisibility-potion": { 1: 30, 2: 70, 3: 180 },
+    "healing-potion": { 2: 6, 4: 11, 8: 21 },
+    "mana-potion": { 2: 8, 4: 15, 8: 29 },
+    "strength-potion": { 2: 10, 4: 19, 8: 37 },
+    "invisibility-potion": { 2: 12, 4: 23, 8: 45 },
   },
 };
+
 const useGameStore = create<GameStore>()((set) => ({
   gameStartTime: null,
   stores: {
@@ -166,7 +165,7 @@ const useGameStore = create<GameStore>()((set) => ({
       for (const item of Object.keys(prices)) {
         prices[item as ItemKey] = Math.floor(Math.random() * 10) + 1;
       }
-      return { itemPrices: prices };
+      return { itemCosts: prices };
     });
   },
 

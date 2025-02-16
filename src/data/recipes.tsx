@@ -11,10 +11,26 @@ import { IngredientKey } from "./ingredients";
 //     "st-john-wort",
 // ]
 
-type Recipe = {
+export const brewKeys = [
+  "healing-potion",
+  "mana-potion",
+  "strength-potion",
+  "invisibility-potion",
+];
+
+type BrewKey = (typeof brewKeys)[number];
+
+export type BrewSize = 2 | 4 | 8;
+
+export const brewSizeNameMap: Record<BrewSize, string> = {
+  2: "Small",
+  4: "Medium",
+  8: "Large",
+};
+
+export type Recipe = {
   name: string;
   description: string;
-  baseValue: number;
   ingredients: IngredientKey[];
   requirements: {
     cauldron: number;
@@ -35,7 +51,6 @@ export const recipeMap: Record<string, Recipe> = {
     name: "Healing Potion",
     description:
       "A potion that heals wounds and restores health. Made with Yarrow and Valerian Root.",
-    baseValue: 50,
     ingredients: ["yarrow", "valerian-root"],
     requirements: {
       cauldron: 1,
@@ -54,7 +69,6 @@ export const recipeMap: Record<string, Recipe> = {
     name: "Mana Potion",
     description:
       "A potion that restores mana and magical energy. Made with Mandrake Root and Mugwort.",
-    baseValue: 60,
     ingredients: ["mandrake-root", "mugwort"],
     requirements: {
       cauldron: 1,
@@ -73,7 +87,6 @@ export const recipeMap: Record<string, Recipe> = {
     name: "Strength Potion",
     description:
       "A potion that increases physical strength. Made with Wolfsbane and Nightshade Berries.",
-    baseValue: 70,
     ingredients: ["wolfsbane", "nightshade-berries"],
     requirements: {
       cauldron: 1,
@@ -92,7 +105,6 @@ export const recipeMap: Record<string, Recipe> = {
     name: "Invisibility Potion",
     description:
       "A potion that grants temporary invisibility. Made with Foxglove and St. John’s Wort.",
-    baseValue: 80,
     ingredients: ["foxglove", "st-john-wort"],
     requirements: {
       cauldron: 2,
@@ -111,4 +123,4 @@ export const recipeMap: Record<string, Recipe> = {
 
 export type RecipeKey = keyof typeof recipeMap;
 
-export const recipeKeys = Object.keys(recipeMap) as [RecipeKey, ...RecipeKey[]];
+// export const recipeKeys = Object.keys(recipeMap) as [RecipeKey, ...RecipeKey[]];

@@ -1,7 +1,7 @@
 import React from "react";
 import { Grid2 as Grid, Button, Box, Typography, Stack } from "@mui/material";
 import { motion } from "motion/react";
-import useGameStore, { PotionShop } from "./useGameStore";
+import useGameStore, { PotionShop } from "./util/useGameStore";
 import { OrderIngredientForm } from "./components/OrderIngredientForm";
 import { SetSellPriceForm } from "./components/SetSellPriceForm";
 import { UpgradeEquipmentForm } from "./components/UpgradeEquipmentForm";
@@ -57,7 +57,7 @@ export default function Home() {
         Home
       </Typography>
 
-      <Grid container spacing={0.1}>
+      <Grid container spacing={1}>
         {/* Human player's shop */}
         <Grid
           size={{
@@ -89,7 +89,7 @@ export default function Home() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
           >
-            <ShopPanel title="Opponent's Shop" shop={opponentShop} />
+            <ShopPanel title="Derris' Shop" shop={opponentShop} />
           </motion.div>
         </Grid>
       </Grid>
