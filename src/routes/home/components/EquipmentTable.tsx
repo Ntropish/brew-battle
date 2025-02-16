@@ -31,15 +31,16 @@ const EquipmentTable = ({ data }: EquipmentTableProps) => {
         header: "Level",
       },
 
-      //   {
-      //     accessorKey: "upgradeCost",
-      //     header: "Upgrade Cost",
-      //     Cell: ({ cell }) =>
-      //       new Intl.NumberFormat("en-US", {
-      //         style: "currency",
-      //         currency: "USD",
-      //       }).format(cell.getValue() as number),
-      //   },
+      // {
+      //   accessorKey: "upgradeCost",
+      //   header: "Upgrade Cost",
+      //   Cell: ({ cell }) =>
+      //     new Intl.NumberFormat("en-US", {
+      //       style: "currency",
+      //       currency: "USD",
+      //     }).format(cell.getValue() as number),
+
+      // },
     ],
     []
   );
@@ -47,6 +48,8 @@ const EquipmentTable = ({ data }: EquipmentTableProps) => {
   const getDeliveryTime = () => {
     return addMinutes(new Date(), 5);
   };
+
+  console.log(data);
 
   const tableConfig = useMemo(() => {
     const config: MRT_TableOptions<EquipmentRow> = {
@@ -60,7 +63,7 @@ const EquipmentTable = ({ data }: EquipmentTableProps) => {
       <UpgradeButton
         onBuy={() => console.info("Upgrade", row.getValue("name"))}
         key={row.getValue("name")}
-        upgradeCost={row.getValue("upgradeCost")}
+        upgradeCost={row.original.upgradeCost}
         getDeliveryTime={getDeliveryTime}
       />,
     ];

@@ -31,16 +31,9 @@ const UpgradeButton = ({
     <>
       <Tooltip title={tooltipTitle} placement="bottom" arrow>
         <Button onClick={() => onBuy()}>
-          <Stack
-            direction="row"
-            sx={{
-              width: "7.5rem",
-            }}
-          >
+          <Stack direction="row" sx={{}}>
             <Box
               sx={{
-                width: "6rem",
-                textAlign: "left",
                 whiteSpace: "nowrap",
               }}
             >

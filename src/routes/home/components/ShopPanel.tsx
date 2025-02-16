@@ -102,7 +102,15 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 aria-controls="panel1a-content"
                 id="ingredient-header"
               >
-                <Typography variant="h6">Ingredients</Typography>
+                <Typography
+                  variant="h6"
+                  color="textSecondary"
+                  sx={{
+                    fontWeight: 100,
+                  }}
+                >
+                  Ingredients
+                </Typography>
               </AccordionSummary>
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}
@@ -116,7 +124,15 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 aria-controls="panel1a-content"
                 id="item-header"
               >
-                <Typography variant="h6">Items</Typography>
+                <Typography
+                  variant="h6"
+                  color="textSecondary"
+                  sx={{
+                    fontWeight: 100,
+                  }}
+                >
+                  Items
+                </Typography>
               </AccordionSummary>
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}
@@ -130,7 +146,15 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 aria-controls="panel1a-content"
                 id="equipment-header"
               >
-                <Typography variant="h6">Equipment</Typography>
+                <Typography
+                  variant="h6"
+                  color="textSecondary"
+                  sx={{
+                    fontWeight: 100,
+                  }}
+                >
+                  Equipment
+                </Typography>
               </AccordionSummary>
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}
@@ -147,7 +171,15 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
             aria-controls="panel1a-content"
             id="brews-header"
           >
-            <Typography variant="h6">Brews</Typography>
+            <Typography
+              variant="h6"
+              color="textSecondary"
+              sx={{
+                fontWeight: 100,
+              }}
+            >
+              Brews
+            </Typography>
           </AccordionSummary>
           <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
             <BrewTable data={brewRows} canWrite={canWrite} />
