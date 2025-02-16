@@ -9,6 +9,7 @@ type SellPriceCellProps = {
   brewKey: BrewKey;
   brewSize: BrewSize;
   onEditClick: (e: React.MouseEvent<HTMLElement>) => void;
+  canWrite?: boolean;
 };
 
 const SellPriceCell: React.FC<SellPriceCellProps> = ({
@@ -17,10 +18,13 @@ const SellPriceCell: React.FC<SellPriceCellProps> = ({
   brewSize,
 
   onEditClick,
+  canWrite,
 }) => {
   const formattedSellPrice = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 3,
   }).format(value);
 
   return (
@@ -29,14 +33,16 @@ const SellPriceCell: React.FC<SellPriceCellProps> = ({
         {formattedSellPrice}
       </Typography>
 
-      <IconButton
-        onClick={onEditClick}
-        data-brew-key={brewKey}
-        data-brew-size={brewSize}
-        data-price={value}
-      >
-        <EditIcon />
-      </IconButton>
+      {canWrite && (
+        <IconButton
+          data-brew-key={brewKey}
+          data-brew-size={brewSize}
+          data-price={value}
+          onClick={onEditClick}
+        >
+          <EditIcon />
+        </IconButton>
+      )}
     </Stack>
   );
 };

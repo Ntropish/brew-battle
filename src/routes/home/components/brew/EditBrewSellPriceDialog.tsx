@@ -90,9 +90,10 @@ const EditBrewSellPriceDialog = ({
 
   const formattedPriceDifference = React.useMemo(() => {
     if (priceDifference === null || priceDifference === 0) return null;
-    return priceDifference > 0
-      ? `+$${priceDifference}`
-      : `-$${-priceDifference}`;
+    return Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(priceDifference);
   }, [priceDifference]);
 
   const priceHelperText =

@@ -6,7 +6,7 @@ function App() {
   const isSmall = useMediaQuery("(max-width:900px)");
   return (
     <Container
-      maxWidth="lg"
+      maxWidth="xl"
       sx={{
         height: `100%`,
         width: `100%`,

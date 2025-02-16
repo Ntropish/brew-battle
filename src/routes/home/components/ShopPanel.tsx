@@ -17,7 +17,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import EquipmentTable, { EquipmentRow } from "./EquipmentTable";
 import { equipmentMap } from "../../../data/equipment";
 import BrewTable, { BrewRow } from "./brew/BrewTable";
-import { recipeMap } from "../../../data/brew";
+import { BrewKey, recipeMap } from "../../../data/brew";
 // This type should match the shape of your PotionShop from your Zustand store.
 
 interface ShopPanelProps {
@@ -69,7 +69,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
     return Object.entries(shop.inventory.brews).flatMap(([key, brew]) => {
       return Object.entries(brew).map(([size, count]) => ({
         key: `${key}-${size}`,
-        brewKey: key,
+        brewKey: key as BrewKey,
         brewSize: size,
         size: Number(size),
         name: recipeMap[key].name,
@@ -96,6 +96,26 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         <Typography variant="subtitle1">Gold: {shop.gold}</Typography>
       )}
       <Box mt={1}>
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMore />}
+            aria-controls="panel1a-content"
+            id="brews-header"
+          >
+            <Typography
+              variant="h6"
+              color="textSecondary"
+              sx={{
+                fontWeight: 100,
+              }}
+            >
+              Brews
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
+            <BrewTable data={brewRows} canWrite={canWrite} />
+          </AccordionDetails>
+        </Accordion>
         {canReadInternal && (
           <>
             <Accordion>
@@ -166,27 +186,6 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
             </Accordion>
           </>
         )}
-
-        <Accordion>
-          <AccordionSummary
-            expandIcon={<ExpandMore />}
-            aria-controls="panel1a-content"
-            id="brews-header"
-          >
-            <Typography
-              variant="h6"
-              color="textSecondary"
-              sx={{
-                fontWeight: 100,
-              }}
-            >
-              Brews
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
-            <BrewTable data={brewRows} canWrite={canWrite} />
-          </AccordionDetails>
-        </Accordion>
       </Box>
     </Paper>
   );

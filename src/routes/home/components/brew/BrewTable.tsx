@@ -32,9 +32,10 @@ export type BrewRow = {
 type BrewTableProps = {
   data: BrewRow[];
   canWrite?: boolean;
+  canReadInventory?: boolean;
 };
 
-const BrewTable = ({ data, canWrite }: BrewTableProps) => {
+const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
   const [defaultEditBrewPriceValues, setDefaultEditBrewPriceValues] =
     React.useState<EditBrewSellPriceForm | null>(null);
   const [editBrewPriceDialogOpen, setEditBrewPriceDialogOpen] =
@@ -70,6 +71,14 @@ const BrewTable = ({ data, canWrite }: BrewTableProps) => {
         accessorKey: "count",
         header: "Count",
         size: 80,
+        // only show up to 10 if !canReadInventory
+        Cell: ({ cell }) => {
+          const value = cell.getValue() as number;
+          return !canReadInventory && value > 10 ? "10+" : value;
+        },
+        aggregationFn: "sum",
+        AggregatedCell: ({ cell }) =>
+          canReadInventory ? `(${cell.getValue() as number})` : null,
       },
       {
         accessorKey: "sellPrice",
@@ -78,6 +87,7 @@ const BrewTable = ({ data, canWrite }: BrewTableProps) => {
         Cell: ({ cell, row }) => {
           return (
             <SellPriceCell
+              canWrite={canWrite}
               brewKey={row.original.brewKey}
               brewSize={row.original.brewSize}
               value={cell.getValue() as number}
@@ -86,8 +96,12 @@ const BrewTable = ({ data, canWrite }: BrewTableProps) => {
           );
         },
       },
+      {
+        accessorKey: "brewKey",
+        header: "Brew Key",
+      },
     ],
-    [handleBeginSellPriceEdit]
+    [canWrite, handleBeginSellPriceEdit]
   );
 
   const tableConfig = React.useMemo(() => {
@@ -95,6 +109,24 @@ const BrewTable = ({ data, canWrite }: BrewTableProps) => {
       columns,
       data,
       ...baseTableConfig,
+      enableGrouping: true,
+      enableColumnDragging: false,
+      initialState: {
+        density: "compact",
+        grouping: ["name"],
+        columnVisibility: {
+          brewKey: false,
+        },
+        columnOrder: [
+          "mrt-row-expand",
+          "mrt-row-actions",
+          "name",
+          "size",
+          "count",
+          "sellPrice",
+          "brewKey",
+        ],
+      },
     };
 
     if (canWrite) {

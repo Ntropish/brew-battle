@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
-import { BrewSize, RecipeKey } from "../../../data/brew";
+import { BrewKey, BrewSize, RecipeKey } from "../../../data/brew";
 import { EquipmentKey } from "../../../data/equipment";
 
 // const ingredientKeys = [
@@ -29,10 +29,10 @@ export interface PotionShop {
   inventory: {
     items: Record<ItemKey, number>;
     ingredients: Record<IngredientKey, number>;
-    brews: Record<RecipeKey, Record<BrewSize, number>>;
+    brews: Record<BrewKey, Record<BrewSize, number>>;
   };
   equipment: Record<EquipmentKey, number>;
-  sellPrices: Record<RecipeKey, Record<RecipeKey, number>>;
+  sellPrices: Record<BrewKey, Record<BrewSize, number>>;
 }
 
 interface OrderIngredientArg {
@@ -98,7 +98,7 @@ const initialShop: PotionShop = {
       "st-john-wort": 7,
     },
     brews: {
-      "healing-potion": { 2: 5, 4: 3, 8: 1 },
+      "healing-potion": { 2: 12, 4: 3, 8: 1 },
       "mana-potion": { 2: 4, 4: 2, 8: 1 },
       "strength-potion": { 2: 3, 4: 2, 8: 1 },
       "invisibility-potion": { 2: 2, 4: 1, 8: 0 },
