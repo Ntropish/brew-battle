@@ -1,11 +1,18 @@
 import React from "react";
-import { Grid2 as Grid, Button, Box, Typography, Stack } from "@mui/material";
+import { Button, Box, Typography, Stack, Tabs, Tab } from "@mui/material";
 import { motion } from "motion/react";
 import useGameStore, { PotionShop } from "./util/useGameStore";
 import { OrderIngredientForm } from "./components/OrderIngredientForm";
 import { SetSellPriceForm } from "./components/SetSellPriceForm";
 import { UpgradeEquipmentForm } from "./components/UpgradeEquipmentForm";
 import ShopPanel from "./components/ShopPanel";
+import { z } from "zod";
+
+const tabSchema = z.enum(["own-shop", "derris-shop"]);
+
+const tabKeys = tabSchema.options;
+
+type Tab = z.infer<typeof tabSchema>;
 
 export default function Home() {
   const { stores, orderIngredient, setSellPrice, upgradeEquipment } =
@@ -15,6 +22,8 @@ export default function Home() {
   const playerShop: PotionShop = stores.player;
   // "derris" is the computer/opponent shop (read-only).
   const opponentShop: PotionShop = stores.derris;
+
+  const [tab, setTab] = React.useState<Tab>("own-shop");
 
   const handleOrderIngredient = (values: {
     ingredient: string;
@@ -53,46 +62,28 @@ export default function Home() {
         m: 0.1,
       }}
     >
-      <Typography variant="h4" color="text.secondary">
-        Home
-      </Typography>
-
-      <Grid container spacing={1}>
-        {/* Human player's shop */}
-        <Grid
-          size={{
-            xs: 12,
-            md: 6,
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <ShopPanel
-              title="Your Shop"
-              shop={playerShop}
-              canWrite
-              canReadInternal
-            />
-          </motion.div>
-        </Grid>
-
-        {/* Opponent's shop: read-only */}
-        <Grid
-          size={{
-            xs: 12,
-            md: 6,
-          }}
-        >
-          <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
-            <ShopPanel title="Derris' Shop" shop={opponentShop} />
-          </motion.div>
-        </Grid>
-      </Grid>
+      <Tabs
+        value={tab}
+        onChange={(e, v) => setTab(v)}
+        textColor="secondary"
+        indicatorColor="secondary"
+        variant="fullWidth"
+      >
+        {tabKeys.map((key) => (
+          <Tab key={key} value={key} label={key.replace("-", " ")} />
+        ))}
+      </Tabs>
+      {tab === "own-shop" && (
+        <ShopPanel
+          title="Your Shop"
+          shop={playerShop}
+          canWrite
+          canReadInternal
+        />
+      )}
+      {tab === "derris-shop" && (
+        <ShopPanel title="Derris' Shop" shop={opponentShop} />
+      )}
     </Stack>
   );
 }

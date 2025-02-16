@@ -82,14 +82,6 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
 
   return (
     <Paper sx={{ m: 0.1, p: 0.1 }}>
-      <Typography
-        variant="h5"
-        gutterBottom
-        sx={{ textAlign: "center", fontWeight: 100 }}
-        color="textSecondary"
-      >
-        {title}
-      </Typography>
       {/* <Typography variant="subtitle1">Gold: {shop.gold}</Typography>
        */}
       {canReadInternal && (

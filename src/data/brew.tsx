@@ -26,6 +26,8 @@ export const brewKeySchema = z.enum([
   "invisibility-potion",
 ]);
 
+export const brewKeys = brewKeySchema.options as [BrewKey, ...BrewKey[]];
+
 export type BrewKey = z.infer<typeof brewKeySchema>;
 
 // export type BrewSize = 2 | 4 | 8;

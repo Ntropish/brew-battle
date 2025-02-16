@@ -11,9 +11,9 @@ import {
   Box,
   Typography,
 } from "@mui/material";
-import { RecipeKey, recipeKeys } from "../../../data/brew";
+import { RecipeKey, brewKeys } from "../../../data/brew";
 
-const itemEnum = z.enum(recipeKeys);
+const itemEnum = z.enum(brewKeys);
 const sellPriceSchema = z.object({
   item: itemEnum,
   amount: z.number().min(1).max(10000),
@@ -29,7 +29,7 @@ export const SetSellPriceForm: React.FC<SetSellPriceFormProps> = ({
 }) => {
   const form = useForm<SellPriceFormValues>({
     defaultValues: {
-      item: recipeKeys[0],
+      item: brewKeys[0],
       amount: 75,
     },
     onSubmit: async ({ value }) => {
