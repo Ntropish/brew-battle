@@ -6,25 +6,20 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 
-import { BrewSize, brewSizeNameMap } from "../../../../data/brew";
+import { BrewKey, BrewSize, brewSizeNameMap } from "../../../../data/brew";
 import { baseTableConfig } from "../../util/materialReactTable";
+
+import EditBrewSellPriceDialog from "./EditBrewSellPriceDialog";
+import { EditBrewSellPriceForm, editBrewSellPriceFormSchema } from "./schema";
+
+import { BrewRow } from "./schema";
 import { Button } from "@mui/material";
 
-import SellPriceCell from "./SellPriceCell";
-import EditBrewSellPriceDialog from "./EditBrewSellPriceDialog";
-import {
-  BrewRow,
-  EditBrewSellPriceForm,
-  editBrewSellPriceFormSchema,
-} from "./schema";
-
-type BrewTableProps = {
+type CompetitorBrewTableProps = {
   data: BrewRow[];
-  canWrite?: boolean;
-  canReadInventory?: boolean;
 };
 
-const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
+const CompetitorBrewTable = ({ data }: CompetitorBrewTableProps) => {
   const [defaultEditBrewPriceValues, setDefaultEditBrewPriceValues] =
     React.useState<EditBrewSellPriceForm | null>(null);
   const [editBrewPriceDialogOpen, setEditBrewPriceDialogOpen] =
@@ -63,25 +58,20 @@ const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
         // only show up to 10 if !canReadInventory
         Cell: ({ cell }) => {
           const value = cell.getValue() as number;
-          return !canReadInventory && value > 10 ? "10+" : value;
+          return value > 10 ? "10+" : value;
         },
-        aggregationFn: "sum",
-        AggregatedCell: ({ cell }) =>
-          canReadInventory ? `(${cell.getValue() as number})` : null,
       },
       {
         accessorKey: "sellPrice",
-        header: "Sell Price",
+        header: "Cost",
         size: 80,
-        Cell: ({ cell, row }) => {
-          return (
-            <SellPriceCell
-              brewKey={row.original.brewKey}
-              brewSize={row.original.brewSize}
-              value={cell.getValue() as number}
-              onEditClick={handleBeginSellPriceEdit}
-            />
-          );
+        Cell: ({ cell }) => {
+          return new Intl.NumberFormat("en-US", {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 3,
+          }).format(cell.getValue() as number);
         },
       },
       {
@@ -89,7 +79,7 @@ const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
         header: "Brew Key",
       },
     ],
-    [canReadInventory, handleBeginSellPriceEdit]
+    []
   );
 
   const tableConfig = React.useMemo(() => {
@@ -122,11 +112,12 @@ const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
       <Button
         variant="text"
         key="brew"
-        onClick={() => console.info("Brew", row.getValue("name"))}
+        onClick={() => console.info("Buy", row.getValue("name"))}
       >
-        Brew
+        Buy
       </Button>,
     ];
+
     return config;
   }, [columns, data]);
 
@@ -149,4 +140,4 @@ const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
   );
 };
 
-export default BrewTable;
+export default CompetitorBrewTable;

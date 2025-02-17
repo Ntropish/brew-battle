@@ -9,6 +9,8 @@ import ShopPanel from "./components/ShopPanel";
 import { z } from "zod";
 import ChatMessagesDisplay, { Message } from "./components/ChatMessagesDisplay";
 import ChatInput from "./components/ChatInput";
+import CompetitorBrewTable from "./components/brew/CompetitorBrewTable";
+import CompetitorShopPanel from "./components/CompetitorShopPanel";
 
 const tabSchema = z.enum(["own-shop", "derris-shop"]);
 
@@ -91,6 +93,7 @@ export default function Home() {
       )}
       {tab === "derris-shop" && (
         <>
+          {" "}
           <Stack
             direction="row"
             spacing={1}
@@ -128,7 +131,7 @@ export default function Home() {
               />
             </Stack>
           </Stack>
-          <ShopPanel title="Derris" shop={opponentShop} />
+          <CompetitorShopPanel shop={opponentShop} />
         </>
       )}
     </Stack>

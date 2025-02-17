@@ -1,5 +1,10 @@
 import * as z from "zod";
-import { brewKeySchema, brewSizeSchema } from "../../../../data/brew";
+import {
+  BrewKey,
+  brewKeySchema,
+  BrewSize,
+  brewSizeSchema,
+} from "../../../../data/brew";
 
 export const editBrewSellPriceFormSchema = z.object({
   brewKey: brewKeySchema,
@@ -26,3 +31,12 @@ export const editBrewSellPriceFormSchema = z.object({
 });
 
 export type EditBrewSellPriceForm = z.infer<typeof editBrewSellPriceFormSchema>;
+
+export type BrewRow = {
+  brewKey: BrewKey;
+  brewSize: BrewSize;
+  name: string;
+  size: number;
+  count: number;
+  sellPrice: number;
+};

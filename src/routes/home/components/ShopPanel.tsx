@@ -17,8 +17,9 @@ import ItemTable, { ItemRow } from "./ItemTable";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import EquipmentTable, { EquipmentRow } from "./EquipmentTable";
 import { equipmentMap } from "../../../data/equipment";
-import BrewTable, { BrewRow } from "./brew/BrewTable";
-import { BrewKey, recipeMap } from "../../../data/brew";
+import BrewTable from "./brew/BrewTable";
+import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
+import { BrewRow } from "./brew/schema";
 // This type should match the shape of your PotionShop from your Zustand store.
 
 interface ShopPanelProps {
@@ -29,7 +30,6 @@ interface ShopPanelProps {
 }
 
 export const ShopPanel: React.FC<ShopPanelProps> = ({
-  title,
   shop,
   canWrite = false,
   canReadInternal = false,
@@ -71,12 +71,12 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
       return Object.entries(brew).map(([size, count]) => ({
         key: `${key}-${size}`,
         brewKey: key as BrewKey,
-        brewSize: size,
+        brewSize: size as BrewSize,
         size: Number(size),
         name: recipeMap[key].name,
         description: recipeMap[key].description,
         count: Number(count),
-        sellPrice: shop.sellPrices[key][size] || NaN,
+        sellPrice: shop.sellPrices[key as BrewKey][size as BrewSize] || NaN,
       }));
     });
   }, [shop.inventory.brews, shop.sellPrices]);

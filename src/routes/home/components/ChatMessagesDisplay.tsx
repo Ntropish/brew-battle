@@ -73,6 +73,7 @@ export default function ChatMessagesDisplay({
         overflowY: "auto",
         scrollbarGutter: "stable",
         pr: 1,
+        pt: 1,
       }}
     >
       {messages.map((message, index) => (
@@ -94,7 +95,7 @@ export default function ChatMessagesDisplay({
             >
               <Chip
                 label={message.content}
-                color={message.role === "user" ? "primary" : "info"}
+                color={message.role === "user" ? "primary" : "secondary"}
                 variant="outlined"
               />
             </Stack>

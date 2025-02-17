@@ -51,7 +51,7 @@ const OrderButton = ({
     style: "percent",
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
-  }).format(discount / 100);
+  }).format(-discount / 100);
 
   const deliveryTime = getDeliveryTime(quantities[selectedIndex]);
 
@@ -89,6 +89,7 @@ const OrderButton = ({
                     fontSize: "0.7rem",
                     height: "20px",
                     minWidth: "20px",
+                    top: 10,
                   },
                 }}
               >

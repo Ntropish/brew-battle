@@ -8,7 +8,7 @@
 // enableColumnActions: false,
 
 export const baseTableConfig = {
-  muiTableContainerProps: { sx: { maxHeight: "300px" } },
+  muiTableContainerProps: { sx: { maxHeight: "1200px" } },
   muiTablePaperProps: { elevation: 0 },
   enableTopToolbar: false,
   enablePagination: false,
