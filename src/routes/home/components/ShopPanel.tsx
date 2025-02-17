@@ -117,9 +117,9 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
             backgroundSize: "cover",
             backgroundPosition: "center",
             maskImage:
-              "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
+              "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%)",
             WebkitMaskImage:
-              "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
+              "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%)",
             // apply a blur
             filter: "blur(6px)",
           }}
@@ -140,7 +140,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         <Box
           sx={{
             position: "absolute",
-            bottom: 42,
+            top: 12,
             right: 16,
             zIndex: 1,
           }}
