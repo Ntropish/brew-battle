@@ -58,6 +58,7 @@ export default function Home() {
       sx={{
         flex: 1,
         minHeight: 0,
+        maxHeight: "100%",
         p: 0.1,
         m: 0.1,
       }}

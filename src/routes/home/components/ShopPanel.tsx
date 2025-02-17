@@ -6,6 +6,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Stack,
 } from "@mui/material";
 
 import useGameStore, { PotionShop } from "../util/useGameStore"; // Adjust the import based on your file structure
@@ -81,11 +82,28 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
   }, [shop.inventory.brews, shop.sellPrices]);
 
   return (
-    <Paper sx={{ m: 0.1, p: 0.1 }}>
+    <Paper
+      sx={{
+        flex: "1 1 0",
+        minHeight: 0,
+        maxHeight: "100%",
+        overflowY: "auto",
+        scrollbarGutter: "stable",
+      }}
+    >
       {/* <Typography variant="subtitle1">Gold: {shop.gold}</Typography>
        */}
       {canReadInternal && (
-        <Typography variant="subtitle1">Gold: {shop.gold}</Typography>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="flex-start"
+          m={1}
+          spacing={1}
+        >
+          <img src={"/coins.webp"} alt="Shop" style={{ width: "32px" }} />
+          <Typography variant="subtitle1">{shop.gold} GP</Typography>
+        </Stack>
       )}
       <Box mt={1}>
         <Accordion>
@@ -94,15 +112,22 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
             aria-controls="panel1a-content"
             id="brews-header"
           >
-            <Typography
-              variant="h6"
-              color="textSecondary"
-              sx={{
-                fontWeight: 100,
-              }}
-            >
-              Brews
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <img
+                src="/potion.webp"
+                alt="brew section icon"
+                style={{ width: "42px" }}
+              />
+              <Typography
+                variant="h6"
+                color="textSecondary"
+                sx={{
+                  fontWeight: 100,
+                }}
+              >
+                Brews
+              </Typography>
+            </Stack>
           </AccordionSummary>
           <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
             <BrewTable data={brewRows} canWrite={canWrite} />
@@ -116,15 +141,22 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 aria-controls="panel1a-content"
                 id="ingredient-header"
               >
-                <Typography
-                  variant="h6"
-                  color="textSecondary"
-                  sx={{
-                    fontWeight: 100,
-                  }}
-                >
-                  Ingredients
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src="/ingredient.webp"
+                    alt="brew section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Ingredients
+                  </Typography>
+                </Stack>
               </AccordionSummary>
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}
@@ -138,15 +170,22 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 aria-controls="panel1a-content"
                 id="item-header"
               >
-                <Typography
-                  variant="h6"
-                  color="textSecondary"
-                  sx={{
-                    fontWeight: 100,
-                  }}
-                >
-                  Items
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src="/items.webp"
+                    alt="brew section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Items
+                  </Typography>
+                </Stack>
               </AccordionSummary>
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}
@@ -160,15 +199,22 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 aria-controls="panel1a-content"
                 id="equipment-header"
               >
-                <Typography
-                  variant="h6"
-                  color="textSecondary"
-                  sx={{
-                    fontWeight: 100,
-                  }}
-                >
-                  Equipment
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src="/equipment.webp"
+                    alt="brew section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Equipment
+                  </Typography>
+                </Stack>
               </AccordionSummary>
               <AccordionDetails
                 sx={{ overflowY: "auto", margin: 0, padding: 0 }}

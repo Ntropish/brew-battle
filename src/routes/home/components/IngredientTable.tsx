@@ -6,10 +6,8 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { baseTableConfig } from "../util/materialReactTable";
-import { Button } from "@mui/material";
-import BuyButton from "./BuyButton";
 import OrderButton from "./OrderButton";
-import { addDays, addMinutes } from "date-fns";
+import { addMinutes } from "date-fns";
 
 export type IngredientRow = {
   name: string;

@@ -13,6 +13,7 @@ function App() {
         display: "flex",
         flexDirection: "column",
         minHeight: "0",
+        pb: isSmall ? 0 : 1,
       }}
       disableGutters={isSmall}
     >
