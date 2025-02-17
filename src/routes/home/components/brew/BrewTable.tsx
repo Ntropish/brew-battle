@@ -20,11 +20,10 @@ import {
 
 type BrewTableProps = {
   data: BrewRow[];
-  canWrite?: boolean;
   canReadInventory?: boolean;
 };
 
-const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
+const BrewTable = ({ data }: BrewTableProps) => {
   const [defaultEditBrewPriceValues, setDefaultEditBrewPriceValues] =
     React.useState<EditBrewSellPriceForm | null>(null);
   const [editBrewPriceDialogOpen, setEditBrewPriceDialogOpen] =
@@ -63,11 +62,10 @@ const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
         // only show up to 10 if !canReadInventory
         Cell: ({ cell }) => {
           const value = cell.getValue() as number;
-          return !canReadInventory && value > 10 ? "10+" : value;
+          return value;
         },
         aggregationFn: "sum",
-        AggregatedCell: ({ cell }) =>
-          canReadInventory ? `(${cell.getValue() as number})` : null,
+        AggregatedCell: ({ cell }) => `(${cell.getValue() as number})`,
       },
       {
         accessorKey: "sellPrice",
@@ -89,7 +87,7 @@ const BrewTable = ({ data, canWrite, canReadInventory }: BrewTableProps) => {
         header: "Brew Key",
       },
     ],
-    [canReadInventory, handleBeginSellPriceEdit]
+    [handleBeginSellPriceEdit]
   );
 
   const tableConfig = React.useMemo(() => {

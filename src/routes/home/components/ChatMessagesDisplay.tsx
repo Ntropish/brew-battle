@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { Box, Chip, Divider, Stack, Typography } from "@mui/material";
+import { Box, Chip, Divider, Stack } from "@mui/material";
 
 export type Message = {
   id: string;

@@ -7,7 +7,7 @@ import {
 } from "material-react-table";
 import OrderButton from "./OrderButton";
 import { baseTableConfig } from "../util/materialReactTable";
-import { addDays, addMinutes } from "date-fns";
+import { addMinutes } from "date-fns";
 
 export type ItemRow = {
   name: string;
