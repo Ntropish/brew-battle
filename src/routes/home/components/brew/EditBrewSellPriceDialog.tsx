@@ -11,11 +11,7 @@ import {
 } from "@mui/material";
 import { useForm } from "@tanstack/react-form";
 import { EditBrewSellPriceForm, editBrewSellPriceFormSchema } from "./schema";
-import {
-  brewSizeAbbreviationMap,
-  brewSizeNameMap,
-  recipeMap,
-} from "../../../../data/brew";
+import { brewSizeAbbreviationMap, recipeMap } from "../../../../data/brew";
 
 type EditBrewSellPriceDialogProps = {
   open: boolean;
