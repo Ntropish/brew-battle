@@ -6,11 +6,11 @@ import { quotes } from "../../../data/quotes";
 
 // Configuration constants
 const PUNCTUATION_DELAYS: { [key: string]: number } = {
-  ",": 5000,
-  ".": 8000,
-  "-": 3000,
-  "—": 5000,
-  default: 4000,
+  ",": 3000,
+  ".": 4000,
+  "-": 2000,
+  "—": 4000,
+  default: 2000,
 };
 
 const SEGMENT_FADE_IN_DURATION_MS = 3000; // Each segment's fade-in time

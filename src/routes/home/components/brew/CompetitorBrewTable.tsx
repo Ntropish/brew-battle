@@ -6,11 +6,11 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 
-import { BrewKey, BrewSize, brewSizeNameMap } from "../../../../data/brew";
+import { BrewSize, brewSizeNameMap } from "../../../../data/brew";
 import { baseTableConfig } from "../../util/materialReactTable";
 
 import EditBrewSellPriceDialog from "./EditBrewSellPriceDialog";
-import { EditBrewSellPriceForm, editBrewSellPriceFormSchema } from "./schema";
+import { EditBrewSellPriceForm } from "./schema";
 
 import { BrewRow } from "./schema";
 import { Button } from "@mui/material";
@@ -25,20 +25,6 @@ const CompetitorBrewTable = ({ data }: CompetitorBrewTableProps) => {
   const [editBrewPriceDialogOpen, setEditBrewPriceDialogOpen] =
     React.useState(false);
 
-  const handleBeginSellPriceEdit = React.useCallback(
-    (e: React.MouseEvent<HTMLElement>) => {
-      const validatedDefaultValues = editBrewSellPriceFormSchema.parse({
-        brewKey: e.currentTarget.dataset.brewKey,
-        brewSize: e.currentTarget.dataset.brewSize,
-        // price: e.currentTarget.dataset.price,
-        price: Number(e.currentTarget.dataset.price),
-      });
-
-      setDefaultEditBrewPriceValues(validatedDefaultValues);
-      setEditBrewPriceDialogOpen(true);
-    },
-    []
-  );
   const columns = React.useMemo<MRT_ColumnDef<BrewRow>[]>(
     () => [
       {

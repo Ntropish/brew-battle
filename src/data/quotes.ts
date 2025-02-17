@@ -318,4 +318,132 @@ export const quotes = [
     "May your elixir be a testament to boundless curiosity, bridging the known with the mysteries yet to be revealed.",
     "As you mix your potion, inscribe the pages of discovery with the ink of inquiry and the quill of reason.",
   ],
+  // Mario
+  [
+    "Brew your elixir with the heart of adventure—each drop is a jump into a brighter world.",
+    "Let your potion transform obstacles into power-ups, fueling your journey one sip at a time.",
+    "Mix your brew with bold spirit; even the simplest potion can launch you to new heights.",
+    "Every carefully gathered ingredient is a secret power, waiting to turn challenges into triumphs.",
+    "In the cauldron of life, let your potion be the spark that ignites endless possibility.",
+  ],
+
+  // Link
+  [
+    "Let your potion be a silent guardian, a restorative brew drawn from ancient woods.",
+    "Every measured drop is a healing balm for the weary soul on a quest through shadowed lands.",
+    "Stir your elixir with wisdom inherited from forgotten legends, and let it mend both body and heart.",
+    "May your brew carry the resilience of a sacred spring, restoring hope amid hidden dangers.",
+    "In every potion, find the strength of a hero destined to restore balance to a troubled realm.",
+  ],
+
+  // Master Chief
+  [
+    "Forge your elixir in the crucible of resolve—each ingredient a shield against the coming storm.",
+    "Let your potion be a blend of discipline and courage, a vital serum in the theater of war.",
+    "Every drop is a tactical advantage, honed in the heat of battle and the cold of space.",
+    "Mix your brew with unwavering focus, transforming raw elements into the strength to overcome.",
+    "In the darkest hours, let your potion be the steady force that guides you through the void.",
+  ],
+
+  // Lara Croft
+  [
+    "Let your potion be a key to lost worlds, each ingredient a clue in the labyrinth of history.",
+    "Brew an elixir that unlocks ancient secrets, revealing wisdom hidden in the ruins of time.",
+    "Every herb and spice is a relic of the past—mix them to uncover stories waiting to be told.",
+    "Stir your brew with relentless curiosity, turning every challenge into a discovery of truth.",
+    "May your potion chart a path through forgotten realms, guiding you to treasures of insight.",
+  ],
+
+  // Solid Snake
+  [
+    "Brew your potion in the shadows, where every measured drop conceals a truth worth fighting for.",
+    "Let your elixir be a covert blend of resilience and stealth, a secret weapon in a world of deception.",
+    "Every ingredient is a silent vow—a hidden strength to overcome the unseen enemy.",
+    "Mix your brew with precision, crafting an elixir that fuels survival in the midst of chaos.",
+    "In the dark corners of conflict, let your potion be the quiet rebellion against a world built on lies.",
+  ],
+  // Socrates
+  [
+    "Brew your potion with a questioning spirit; let every drop be a quest for truth.",
+    "Let your elixir mirror the soul, revealing the wisdom hidden within each carefully chosen herb.",
+    "In the cauldron of life, the examined brew transforms mere ingredients into the essence of understanding.",
+    "Stir with humility and curiosity—each measure is an invitation to uncover the secrets of existence.",
+    "May your potion remind you that knowing the limits of your brew is the first step toward true wisdom.",
+  ],
+
+  // Plato
+  [
+    "Let your potion capture the essence of ideal forms, each drop reflecting a purer realm beyond the mundane.",
+    "In your brew, seek the light that dissolves the shadows of ignorance—an elixir of transcendent truth.",
+    "Stir your cauldron as you pursue perfection, blending ingredients to reveal the eternal beauty of the forms.",
+    "May your potion be a taste of the divine, a bridge from the imperfect world to a higher, immutable reality.",
+    "Mix your elixir with vision, transforming each element into a whisper of the perfect, unseen order.",
+  ],
+
+  // Aristotle
+  [
+    "Blend your potion with measured care; every ingredient must find its rightful place in nature’s grand design.",
+    "Let your elixir be a harmonious union, where reason and passion mix to create the balanced brew of life.",
+    "In the cauldron, distill wisdom by aligning each component with the natural order and the golden mean.",
+    "Stir with practical insight—each drop is a lesson in the art of achieving balance between extremes.",
+    "May your potion reflect the cosmos' order, a tangible expression of nature’s rational and vibrant beauty.",
+  ],
+
+  // Heraclitus
+  [
+    "Let your potion embody the eternal flux, each drop a fleeting moment in the ceaseless flow of change.",
+    "In the simmer of your brew, embrace the paradox: every ending in the cauldron births a new beginning.",
+    "Mix your elixir as the cosmos evolves—each ingredient a spark in the ever-changing fire of life.",
+    "Stir with the awareness that change is the only constant; let your potion be a tribute to the dance of opposites.",
+    "May the brew remind you that transformation is inherent in every measure, as fluid as the river of time.",
+  ],
+
+  // Pythagoras
+  [
+    "Infuse your potion with harmonious ratios, where every ingredient contributes to a perfect cosmic melody.",
+    "Let your elixir resonate with the music of the spheres, a blend measured in the language of numbers.",
+    "Stir your brew with the precision of a mathematician, aligning each element to the universal rhythm.",
+    "May your potion be a symphony of mystic proportions, each drop a note in the grand score of existence.",
+    "Mix your elixir as you would compose a melody—each ingredient a vital chord in the harmony of life.",
+  ],
+  [
+    // Imhotep
+    "Let your elixir mirror the wisdom of the ancients; each herb is a building block of eternal healing.",
+    "Mix your potion with the precision of an architect of life—every measure an inscription of nature's design.",
+    "In the cauldron of creation, allow the sacred balance of ingredients to forge a remedy for the soul.",
+    "Stir with the care of a healer, for every drop carries the legacy of wisdom etched in stone.",
+    "May your brew embody the art of restoration, a remedy that mends the body and awakens the spirit.",
+  ],
+  [
+    // Thoth
+    "Let your potion flow like the eternal Nile, each drop a testament to the divine order of the cosmos.",
+    "Mix your elixir with the ink of ancient wisdom; every ingredient records a secret on the papyrus of time.",
+    "In the cauldron of creation, stir with the precision of a scribe, aligning each measure with celestial harmony.",
+    "May your brew shine as steadfast as the stars—each drop a verse in the grand chronicle of the universe.",
+    "Let your potion be a manuscript of sacred lore, where raw elements transform into divine insight.",
+  ],
+  [
+    // Cleopatra
+    "Let your potion be as enchanting as the twilight over the Nile—a blend of allure and untamed power.",
+    "Mix your brew with the elegance of a queen; every ingredient whispers secrets of transformation and grace.",
+    "In the cauldron of destiny, let your elixir reflect the timeless beauty and strength of a regal legacy.",
+    "Stir with the finesse of one who commands empires, every measure a subtle art of seduction and resolve.",
+    "May your potion weave a spell of magnetism and might, merging heritage with the magic of possibility.",
+  ],
+  [
+    // Ramesses II
+    "Forge your elixir with the might of a pharaoh; every ingredient is a cornerstone of unyielding strength.",
+    "Let your potion echo the grandeur of monumental legacies—each drop built to withstand the sands of time.",
+    "Mix your brew with the resolve of a warrior king; every measure forms a bastion against the tides of fate.",
+    "In the cauldron of conquest, stir with ambition as vast as the desert, crafting a remedy for adversity.",
+    "May your brew stand as a testament to eternal power—a regal blend of might and destiny.",
+  ],
+  [
+    // Hatshepsut
+    "Let your potion be as bold as a queen who dared reshape destiny; each ingredient forges a path to uncharted realms.",
+    "Mix your brew with the vision of a ruler who harmonized tradition with innovation, blending the old with the new.",
+    "In the cauldron of creation, stir with quiet determination, turning challenges into gateways of renewal.",
+    "May your elixir embody the balance of grace and authority—a gentle force that nurtures transformation.",
+    "Let your potion serve as a legacy of resilience and ambition, a tribute to the spirit that redefines history.",
+  ],
 ].flat();
