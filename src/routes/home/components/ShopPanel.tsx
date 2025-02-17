@@ -21,7 +21,10 @@ import BrewTable from "./brew/BrewTable";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { BrewRow } from "./brew/schema";
 import MasterPotionQuote from "./MasterPotionQuote";
+
 // This type should match the shape of your PotionShop from your Zustand store.
+
+const baseUrl = import.meta.env.BASE_URL || "brew-battle";
 
 interface ShopPanelProps {
   title: string;
@@ -110,7 +113,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundImage: `url(/brew_background.webp)`,
+            backgroundImage: `url(${baseUrl}/brew_background.webp)`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             maskImage:
@@ -127,7 +130,11 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
           justifyContent="flex-start"
           spacing={1}
         >
-          <img src={"/coins.webp"} alt="Shop" style={{ width: "32px" }} />
+          <img
+            src={`${baseUrl}/coins.webp`}
+            alt="Shop"
+            style={{ width: "32px" }}
+          />
           <Typography variant="subtitle1">{shop.gold} GP</Typography>
         </Stack>
         <Box
@@ -150,7 +157,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
           >
             <Stack direction="row" alignItems="center" spacing={1}>
               <img
-                src="/potion.webp"
+                src={`${baseUrl}/potion.webp`}
                 alt="brew section icon"
                 style={{ width: "42px" }}
               />
@@ -179,7 +186,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <img
-                    src="/ingredient.webp"
+                    src={`${baseUrl}/ingredient.webp`}
                     alt="brew section icon"
                     style={{ width: "42px" }}
                   />
@@ -208,7 +215,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <img
-                    src="/items.webp"
+                    src={`${baseUrl}/items.webp`}
                     alt="brew section icon"
                     style={{ width: "42px" }}
                   />
@@ -237,7 +244,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <img
-                    src="/equipment.webp"
+                    src={`${baseUrl}/equipment.webp`}
                     alt="brew section icon"
                     style={{ width: "42px" }}
                   />

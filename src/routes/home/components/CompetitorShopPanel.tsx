@@ -18,6 +18,8 @@ import ChatMessagesDisplay, { Message } from "./ChatMessagesDisplay";
 import ChatInput from "./ChatInput";
 // This type should match the shape of your PotionShop from your Zustand store.
 
+const baseUrl = import.meta.env.BASE_URL || "brew-battle";
+
 interface CompetitorShopPanelProps {
   shop: PotionShop;
 }
@@ -69,7 +71,11 @@ export const CompetitorShopPanel: React.FC<CompetitorShopPanelProps> = ({
         }}
       >
         <Box>
-          <img src={"/derris.png"} alt="Derris" style={{ width: "256px" }} />
+          <img
+            src={`${baseUrl}/derris.png`}
+            alt="Derris"
+            style={{ width: "256px" }}
+          />
         </Box>
         <Stack
           direction="column"
@@ -103,7 +109,7 @@ export const CompetitorShopPanel: React.FC<CompetitorShopPanelProps> = ({
           >
             <Stack direction="row" alignItems="center" spacing={1}>
               <img
-                src="/potion.webp"
+                src={`${baseUrl}/potion.webp`}
                 alt="brew section icon"
                 style={{ width: "42px" }}
               />
