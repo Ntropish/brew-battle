@@ -91,183 +91,192 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         flex: "1 1 0",
         minHeight: 0,
         maxHeight: "100%",
-        overflowY: "auto",
-        scrollbarGutter: "stable",
+        overflow: "hidden",
       }}
     >
       <Stack
-        direction="row"
-        alignItems="flex-end"
-        justifyContent="flex-start"
-        m={1}
-        spacing={1}
         sx={{
-          position: "relative",
-          height: "256px",
+          flex: 1,
+          minHeight: 0,
+          maxHeight: "100%",
+          overflowY: "auto",
+          scrollbarGutter: "stable",
         }}
       >
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundImage: `url(${baseUrl}/brew_background.webp)`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            maskImage:
-              "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%)",
-            WebkitMaskImage:
-              "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%)",
-            // apply a blur
-            filter: "blur(6px)",
-          }}
-        ></Box>
         <Stack
           direction="row"
-          alignItems="center"
+          alignItems="flex-end"
           justifyContent="flex-start"
+          m={1}
           spacing={1}
-        >
-          <img
-            src={`${baseUrl}/coins.webp`}
-            alt="Shop"
-            style={{ width: "32px" }}
-          />
-          <Typography variant="subtitle1">{shop.gold} GP</Typography>
-        </Stack>
-        <Box
           sx={{
-            position: "absolute",
-            top: 12,
-            right: 16,
-            zIndex: 1,
+            position: "relative",
+            flex: "0 0 256px",
           }}
         >
-          <MasterPotionQuote />
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundImage: `url(${baseUrl}/brew_background.webp)`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              maskImage:
+                "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%)",
+              // apply a blur
+              filter: "blur(6px)",
+            }}
+          ></Box>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="flex-start"
+            spacing={1}
+          >
+            <img
+              src={`${baseUrl}/coins.webp`}
+              alt="Shop"
+              style={{ width: "32px" }}
+            />
+            <Typography variant="subtitle1">{shop.gold} GP</Typography>
+          </Stack>
+          <Box
+            sx={{
+              position: "absolute",
+              top: 12,
+              right: 16,
+              zIndex: 1,
+            }}
+          >
+            <MasterPotionQuote />
+          </Box>
+        </Stack>
+        <Box mt={1} pb={1}>
+          <Accordion defaultExpanded={true}>
+            <AccordionSummary
+              expandIcon={<ExpandMore />}
+              aria-controls="panel1a-content"
+              id="brews-header"
+            >
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <img
+                  src={`${baseUrl}/potion.webp`}
+                  alt="brew section icon"
+                  style={{ width: "42px" }}
+                />
+                <Typography
+                  variant="h6"
+                  color="textSecondary"
+                  sx={{
+                    fontWeight: 100,
+                  }}
+                >
+                  Brews
+                </Typography>
+              </Stack>
+            </AccordionSummary>
+            <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
+              <BrewTable data={brewRows} />
+            </AccordionDetails>
+          </Accordion>
+          {canReadInternal && (
+            <>
+              <Accordion defaultExpanded={true}>
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  aria-controls="panel1a-content"
+                  id="ingredient-header"
+                >
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <img
+                      src={`${baseUrl}/ingredient.webp`}
+                      alt="brew section icon"
+                      style={{ width: "42px" }}
+                    />
+                    <Typography
+                      variant="h6"
+                      color="textSecondary"
+                      sx={{
+                        fontWeight: 100,
+                      }}
+                    >
+                      Ingredients
+                    </Typography>
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
+                >
+                  <IngredientTable data={ingredientRows} canWrite={canWrite} />
+                </AccordionDetails>
+              </Accordion>
+              <Accordion defaultExpanded={true}>
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  aria-controls="panel1a-content"
+                  id="item-header"
+                >
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <img
+                      src={`${baseUrl}/items.webp`}
+                      alt="brew section icon"
+                      style={{ width: "42px" }}
+                    />
+                    <Typography
+                      variant="h6"
+                      color="textSecondary"
+                      sx={{
+                        fontWeight: 100,
+                      }}
+                    >
+                      Items
+                    </Typography>
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
+                >
+                  <ItemTable data={itemRows} canWrite={canWrite} />
+                </AccordionDetails>
+              </Accordion>
+              <Accordion defaultExpanded={true}>
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  aria-controls="panel1a-content"
+                  id="equipment-header"
+                >
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <img
+                      src={`${baseUrl}/equipment.webp`}
+                      alt="brew section icon"
+                      style={{ width: "42px" }}
+                    />
+                    <Typography
+                      variant="h6"
+                      color="textSecondary"
+                      sx={{
+                        fontWeight: 100,
+                      }}
+                    >
+                      Equipment
+                    </Typography>
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
+                >
+                  <EquipmentTable data={equipmentRows} />
+                </AccordionDetails>
+              </Accordion>
+            </>
+          )}
         </Box>
       </Stack>
-      <Box mt={1}>
-        <Accordion defaultExpanded={true}>
-          <AccordionSummary
-            expandIcon={<ExpandMore />}
-            aria-controls="panel1a-content"
-            id="brews-header"
-          >
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <img
-                src={`${baseUrl}/potion.webp`}
-                alt="brew section icon"
-                style={{ width: "42px" }}
-              />
-              <Typography
-                variant="h6"
-                color="textSecondary"
-                sx={{
-                  fontWeight: 100,
-                }}
-              >
-                Brews
-              </Typography>
-            </Stack>
-          </AccordionSummary>
-          <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
-            <BrewTable data={brewRows} />
-          </AccordionDetails>
-        </Accordion>
-        {canReadInternal && (
-          <>
-            <Accordion defaultExpanded={true}>
-              <AccordionSummary
-                expandIcon={<ExpandMore />}
-                aria-controls="panel1a-content"
-                id="ingredient-header"
-              >
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <img
-                    src={`${baseUrl}/ingredient.webp`}
-                    alt="brew section icon"
-                    style={{ width: "42px" }}
-                  />
-                  <Typography
-                    variant="h6"
-                    color="textSecondary"
-                    sx={{
-                      fontWeight: 100,
-                    }}
-                  >
-                    Ingredients
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{ overflowY: "auto", margin: 0, padding: 0 }}
-              >
-                <IngredientTable data={ingredientRows} canWrite={canWrite} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion defaultExpanded={true}>
-              <AccordionSummary
-                expandIcon={<ExpandMore />}
-                aria-controls="panel1a-content"
-                id="item-header"
-              >
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <img
-                    src={`${baseUrl}/items.webp`}
-                    alt="brew section icon"
-                    style={{ width: "42px" }}
-                  />
-                  <Typography
-                    variant="h6"
-                    color="textSecondary"
-                    sx={{
-                      fontWeight: 100,
-                    }}
-                  >
-                    Items
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{ overflowY: "auto", margin: 0, padding: 0 }}
-              >
-                <ItemTable data={itemRows} canWrite={canWrite} />
-              </AccordionDetails>
-            </Accordion>
-            <Accordion defaultExpanded={true}>
-              <AccordionSummary
-                expandIcon={<ExpandMore />}
-                aria-controls="panel1a-content"
-                id="equipment-header"
-              >
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <img
-                    src={`${baseUrl}/equipment.webp`}
-                    alt="brew section icon"
-                    style={{ width: "42px" }}
-                  />
-                  <Typography
-                    variant="h6"
-                    color="textSecondary"
-                    sx={{
-                      fontWeight: 100,
-                    }}
-                  >
-                    Equipment
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{ overflowY: "auto", margin: 0, padding: 0 }}
-              >
-                <EquipmentTable data={equipmentRows} />
-              </AccordionDetails>
-            </Accordion>
-          </>
-        )}
-      </Box>
     </Paper>
   );
 };
