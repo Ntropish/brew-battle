@@ -5,13 +5,14 @@ import useGameStore, { PotionShop } from "./util/useGameStore";
 import ShopPanel from "./components/ShopPanel";
 
 import CompetitorShopPanel from "./components/CompetitorShopPanel";
-import { ItemKey } from "../../data/items";
 
 type Tab = "own-shop" | "derris-shop";
 
 export default function Home() {
-  const { stores, orderIngredient, setSellPrice, upgradeEquipment } =
-    useGameStore();
+  const stores = useGameStore((state) => state.stores) as Record<
+    string,
+    PotionShop
+  >;
 
   // "player" is the human shopkeeper.
   const playerShop: PotionShop = stores.player;
@@ -21,33 +22,33 @@ export default function Home() {
   const [tab, setTab] = React.useState<Tab>("own-shop");
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleOrderIngredient = (values: {
-    ingredient: string;
-    amount: number;
-  }) => {
-    orderIngredient({
-      keeper: "player",
-      ingredient: values.ingredient,
-      amount: values.amount,
-    });
-  };
+  // const handleOrderIngredient = (values: {
+  //   ingredient: string;
+  //   amount: number;
+  // }) => {
+  //   orderIngredient({
+  //     keeper: "player",
+  //     ingredient: values.ingredient,
+  //     amount: values.amount,
+  //   });
+  // };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSetSellPrice = (values: { item: string; amount: number }) => {
-    setSellPrice({
-      keeper: "player",
-      item: values.item as ItemKey,
-      amount: values.amount,
-    });
-  };
+  // const handleSetSellPrice = (values: { item: string; amount: number }) => {
+  //   setSellPrice({
+  //     keeper: "player",
+  //     item: values.item as ItemKey,
+  //     amount: values.amount,
+  //   });
+  // };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleUpgradeEquipment = (values: { equipment: string }) => {
-    upgradeEquipment({
-      keeper: "player",
-      equipment: values.equipment,
-    });
-  };
+  // const handleUpgradeEquipment = (values: { equipment: string }) => {
+  //   upgradeEquipment({
+  //     keeper: "player",
+  //     equipment: values.equipment,
+  //   });
+  // };
 
   return (
     <Stack
@@ -63,7 +64,7 @@ export default function Home() {
     >
       <Tabs
         value={tab}
-        onChange={(e, v) => setTab(v)}
+        onChange={(_, v) => setTab(v)}
         variant="fullWidth"
         textColor={tab === "own-shop" ? "primary" : "secondary"}
         indicatorColor={tab === "own-shop" ? "primary" : "secondary"}

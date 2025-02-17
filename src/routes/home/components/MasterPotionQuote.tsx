@@ -8,7 +8,7 @@ import { quotes } from "../../../data/quotes";
 const PUNCTUATION_DELAYS: { [key: string]: number } = {
   ",": 3000,
   ".": 4000,
-  "-": 2000,
+  "-": 500,
   "—": 4000,
   default: 2000,
 };

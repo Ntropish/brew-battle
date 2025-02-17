@@ -29,7 +29,7 @@ const OrderButton = ({
   const open = Boolean(anchorEl);
 
   const handleMenuItemClick = (
-    event: React.MouseEvent<HTMLElement>,
+    _: React.MouseEvent<HTMLElement>,
     index: number
   ) => {
     setSelectedIndex(index);

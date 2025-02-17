@@ -11,7 +11,7 @@ import {
 
 import useGameStore, { PotionShop } from "../util/useGameStore"; // Adjust the import based on your file structure
 import IngredientTable, { IngredientRow } from "./IngredientTable";
-import { itemMap } from "../../../data/items";
+import { ItemKey, itemMap } from "../../../data/items";
 import { ingredientMap } from "../../../data/ingredients";
 import ItemTable, { ItemRow } from "./ItemTable";
 import ExpandMore from "@mui/icons-material/ExpandMore";
@@ -53,7 +53,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
       name: itemMap[key].name,
       description: itemMap[key].description,
       quantity: count,
-      cost: gameStore.itemCosts[key] || NaN,
+      cost: gameStore.itemCosts[key as ItemKey] || NaN,
     }));
   }, [shop.inventory.items]);
 
@@ -166,7 +166,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
             </Stack>
           </AccordionSummary>
           <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
-            <BrewTable data={brewRows} canWrite={canWrite} />
+            <BrewTable data={brewRows} />
           </AccordionDetails>
         </Accordion>
         {canReadInternal && (
