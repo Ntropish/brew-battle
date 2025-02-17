@@ -1,22 +1,13 @@
 import React from "react";
-import { Button, Box, Typography, Stack, Tabs, Tab } from "@mui/material";
-import { motion } from "motion/react";
+import { Stack, Tabs, Tab } from "@mui/material";
+
 import useGameStore, { PotionShop } from "./util/useGameStore";
-import { OrderIngredientForm } from "./components/OrderIngredientForm";
-import { SetSellPriceForm } from "./components/SetSellPriceForm";
-import { UpgradeEquipmentForm } from "./components/UpgradeEquipmentForm";
 import ShopPanel from "./components/ShopPanel";
-import { z } from "zod";
-import ChatMessagesDisplay, { Message } from "./components/ChatMessagesDisplay";
-import ChatInput from "./components/ChatInput";
-import CompetitorBrewTable from "./components/brew/CompetitorBrewTable";
+
 import CompetitorShopPanel from "./components/CompetitorShopPanel";
+import { ItemKey } from "../../data/items";
 
-const tabSchema = z.enum(["own-shop", "derris-shop"]);
-
-const tabKeys = tabSchema.options;
-
-type Tab = z.infer<typeof tabSchema>;
+type Tab = "own-shop" | "derris-shop";
 
 export default function Home() {
   const { stores, orderIngredient, setSellPrice, upgradeEquipment } =
@@ -29,6 +20,7 @@ export default function Home() {
 
   const [tab, setTab] = React.useState<Tab>("own-shop");
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleOrderIngredient = (values: {
     ingredient: string;
     amount: number;
@@ -40,31 +32,22 @@ export default function Home() {
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSetSellPrice = (values: { item: string; amount: number }) => {
     setSellPrice({
       keeper: "player",
-      item: values.item,
+      item: values.item as ItemKey,
       amount: values.amount,
     });
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleUpgradeEquipment = (values: { equipment: string }) => {
     upgradeEquipment({
       keeper: "player",
       equipment: values.equipment,
     });
   };
-
-  const [derrisChatMessages, setDerrisChatMessages] = React.useState<Message[]>(
-    [
-      {
-        id: "derris-welcome",
-        authorName: "Derris",
-        role: "assistant",
-        content: "Welcome to my shop!",
-      },
-    ]
-  );
 
   return (
     <Stack
@@ -93,44 +76,6 @@ export default function Home() {
       )}
       {tab === "derris-shop" && (
         <>
-          {" "}
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{
-              maxHeight: "256px",
-            }}
-          >
-            <Box>
-              <img
-                src={"/derris.png"}
-                alt="Derris"
-                style={{ width: "256px" }}
-              />
-            </Box>
-            <Stack
-              direction="column"
-              spacing={0.1}
-              sx={{
-                flexGrow: 1,
-              }}
-            >
-              <ChatMessagesDisplay messages={derrisChatMessages} />
-              <ChatInput
-                onSendMessage={(text) => {
-                  setDerrisChatMessages((prev) => [
-                    ...prev,
-                    {
-                      id: crypto.randomUUID(),
-                      authorName: "You",
-                      role: "user",
-                      content: text,
-                    },
-                  ]);
-                }}
-              />
-            </Stack>
-          </Stack>
           <CompetitorShopPanel shop={opponentShop} />
         </>
       )}

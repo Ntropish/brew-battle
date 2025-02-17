@@ -14,6 +14,8 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import CompetitorBrewTable from "./brew/CompetitorBrewTable";
 import { BrewRow } from "./brew/schema";
+import ChatMessagesDisplay, { Message } from "./ChatMessagesDisplay";
+import ChatInput from "./ChatInput";
 // This type should match the shape of your PotionShop from your Zustand store.
 
 interface CompetitorShopPanelProps {
@@ -38,6 +40,17 @@ export const CompetitorShopPanel: React.FC<CompetitorShopPanelProps> = ({
     });
   }, [shop.inventory.brews, shop.sellPrices]);
 
+  const [derrisChatMessages, setDerrisChatMessages] = React.useState<Message[]>(
+    [
+      {
+        id: "derris-welcome",
+        authorName: "Derris",
+        role: "assistant",
+        content: "Welcome to my shop!",
+      },
+    ]
+  );
+
   return (
     <Paper
       sx={{
@@ -48,6 +61,39 @@ export const CompetitorShopPanel: React.FC<CompetitorShopPanelProps> = ({
         scrollbarGutter: "stable",
       }}
     >
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          maxHeight: "256px",
+        }}
+      >
+        <Box>
+          <img src={"/derris.png"} alt="Derris" style={{ width: "256px" }} />
+        </Box>
+        <Stack
+          direction="column"
+          spacing={0.1}
+          sx={{
+            flexGrow: 1,
+          }}
+        >
+          <ChatMessagesDisplay messages={derrisChatMessages} />
+          <ChatInput
+            onSendMessage={(text) => {
+              setDerrisChatMessages((prev) => [
+                ...prev,
+                {
+                  id: crypto.randomUUID(),
+                  authorName: "You",
+                  role: "user",
+                  content: text,
+                },
+              ]);
+            }}
+          />
+        </Stack>
+      </Stack>
       <Box mt={1}>
         <Accordion defaultExpanded={true}>
           <AccordionSummary

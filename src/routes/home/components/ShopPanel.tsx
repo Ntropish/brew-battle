@@ -20,6 +20,7 @@ import { equipmentMap } from "../../../data/equipment";
 import BrewTable from "./brew/BrewTable";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { BrewRow } from "./brew/schema";
+import MasterPotionQuote from "./MasterPotionQuote";
 // This type should match the shape of your PotionShop from your Zustand store.
 
 interface ShopPanelProps {
@@ -91,20 +92,55 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         scrollbarGutter: "stable",
       }}
     >
-      {/* <Typography variant="subtitle1">Gold: {shop.gold}</Typography>
-       */}
-      {canReadInternal && (
+      <Stack
+        direction="row"
+        alignItems="flex-end"
+        justifyContent="flex-start"
+        m={1}
+        spacing={1}
+        sx={{
+          position: "relative",
+          height: "256px",
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundImage: `url(/brew_background.webp)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            maskImage:
+              "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 80%)",
+            // apply a blur
+            filter: "blur(6px)",
+          }}
+        ></Box>
         <Stack
           direction="row"
           alignItems="center"
           justifyContent="flex-start"
-          m={1}
           spacing={1}
         >
           <img src={"/coins.webp"} alt="Shop" style={{ width: "32px" }} />
           <Typography variant="subtitle1">{shop.gold} GP</Typography>
         </Stack>
-      )}
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: 16,
+            right: 16,
+            zIndex: 1,
+          }}
+        >
+          <MasterPotionQuote />
+        </Box>
+      </Stack>
       <Box mt={1}>
         <Accordion defaultExpanded={true}>
           <AccordionSummary

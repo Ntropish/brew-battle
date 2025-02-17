@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
-import { BrewKey, BrewSize, RecipeKey } from "../../../data/brew";
+import { BrewKey, BrewSize } from "../../../data/brew";
 import { EquipmentKey } from "../../../data/equipment";
 
 // const ingredientKeys = [
@@ -52,12 +52,6 @@ interface UpgradeEquipmentArg {
   equipment: EquipmentKey;
 }
 
-interface CustomerPurchaseArg {
-  keeper: string;
-  item: ItemKey;
-  amount: number;
-}
-
 export interface GameStore {
   gameStartTime: number | null;
   stores: Record<string, PotionShop>;
@@ -70,13 +64,11 @@ export interface GameStore {
   // Market actions
   setIngredientPrices: (priceMap: Record<IngredientKey, number>) => void;
   setItemPrices: (priceMap: Record<ItemKey, number>) => void;
+
   // Shopkeeper actions
   orderIngredient: (arg: OrderIngredientArg) => void;
   setSellPrice: (arg: setSellPriceArg) => void;
   upgradeEquipment: (arg: UpgradeEquipmentArg) => void;
-
-  // Visitor actions
-  customerPurchase: (arg: CustomerPurchaseArg) => void;
 }
 
 const initialShop: PotionShop = {
@@ -219,26 +211,6 @@ const useGameStore = create<GameStore>()((set) => ({
             equipment: {
               ...shop.equipment,
               [equipment]: (shop.equipment[equipment] ?? 0) + 1,
-            },
-          },
-        },
-      };
-    }),
-  customerPurchase: ({ keeper, item, amount }) =>
-    set((state) => {
-      const shop = state.stores[keeper];
-      return {
-        stores: {
-          ...state.stores,
-          [keeper]: {
-            ...shop,
-            gold: shop.gold + (shop.sellPrices[item] ?? 0) * amount,
-            inventory: {
-              ...shop.inventory,
-              items: {
-                ...shop.inventory.items,
-                [item]: (shop.inventory.items[item] ?? 0) + amount,
-              },
             },
           },
         },

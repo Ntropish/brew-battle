@@ -1,8 +1,20 @@
+import { z } from "zod";
+
 type Consumable = {
   name: string;
   description: string;
   baseValue: number;
 };
+
+export const itemKeySchema = z.enum([
+  "small-bottle",
+  "medium-bottle",
+  "large-bottle",
+]);
+
+export const itemKeys = itemKeySchema.options as [ItemKey, ...ItemKey[]];
+
+export type ItemKey = z.infer<typeof itemKeySchema>;
 
 export const itemMap: Record<string, Consumable> = {
   "small-bottle": {
@@ -21,5 +33,3 @@ export const itemMap: Record<string, Consumable> = {
     baseValue: 5,
   },
 };
-
-export type ItemKey = keyof typeof itemMap;
