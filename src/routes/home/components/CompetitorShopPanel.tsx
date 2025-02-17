@@ -70,11 +70,15 @@ export const CompetitorShopPanel: React.FC<CompetitorShopPanelProps> = ({
           maxHeight: "256px",
         }}
       >
-        <Box>
+        <Box
+          sx={{
+            p: 0.5,
+          }}
+        >
           <img
             src={`${baseUrl}/derris.png`}
             alt="Derris"
-            style={{ width: "256px" }}
+            style={{ width: "6rem" }}
           />
         </Box>
         <Stack
