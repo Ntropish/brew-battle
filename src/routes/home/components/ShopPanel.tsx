@@ -140,7 +140,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         <Box
           sx={{
             position: "absolute",
-            bottom: 32,
+            bottom: 42,
             right: 16,
             zIndex: 1,
           }}
