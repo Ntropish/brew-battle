@@ -106,7 +106,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         </Stack>
       )}
       <Box mt={1}>
-        <Accordion>
+        <Accordion defaultExpanded={true}>
           <AccordionSummary
             expandIcon={<ExpandMore />}
             aria-controls="panel1a-content"
@@ -135,7 +135,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         </Accordion>
         {canReadInternal && (
           <>
-            <Accordion>
+            <Accordion defaultExpanded={true}>
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 aria-controls="panel1a-content"
@@ -164,7 +164,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 <IngredientTable data={ingredientRows} canWrite={canWrite} />
               </AccordionDetails>
             </Accordion>
-            <Accordion>
+            <Accordion defaultExpanded={true}>
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 aria-controls="panel1a-content"
@@ -193,7 +193,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 <ItemTable data={itemRows} canWrite={canWrite} />
               </AccordionDetails>
             </Accordion>
-            <Accordion>
+            <Accordion defaultExpanded={true}>
               <AccordionSummary
                 expandIcon={<ExpandMore />}
                 aria-controls="panel1a-content"

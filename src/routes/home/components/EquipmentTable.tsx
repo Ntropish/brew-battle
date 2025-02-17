@@ -56,6 +56,7 @@ const EquipmentTable = ({ data }: EquipmentTableProps) => {
       columns,
       data,
       ...baseTableConfig,
+      initialState: { density: "compact" },
     };
 
     config.enableRowActions = true;

@@ -7,6 +7,8 @@ import { SetSellPriceForm } from "./components/SetSellPriceForm";
 import { UpgradeEquipmentForm } from "./components/UpgradeEquipmentForm";
 import ShopPanel from "./components/ShopPanel";
 import { z } from "zod";
+import ChatMessagesDisplay, { Message } from "./components/ChatMessagesDisplay";
+import ChatInput from "./components/ChatInput";
 
 const tabSchema = z.enum(["own-shop", "derris-shop"]);
 
@@ -51,6 +53,17 @@ export default function Home() {
     });
   };
 
+  const [derrisChatMessages, setDerrisChatMessages] = React.useState<Message[]>(
+    [
+      {
+        id: "derris-welcome",
+        authorName: "Derris",
+        role: "assistant",
+        content: "Welcome to my shop!",
+      },
+    ]
+  );
+
   return (
     <Stack
       direction="column"
@@ -66,24 +79,57 @@ export default function Home() {
       <Tabs
         value={tab}
         onChange={(e, v) => setTab(v)}
-        textColor="secondary"
-        indicatorColor="secondary"
         variant="fullWidth"
+        textColor={tab === "own-shop" ? "primary" : "secondary"}
+        indicatorColor={tab === "own-shop" ? "primary" : "secondary"}
       >
-        {tabKeys.map((key) => (
-          <Tab key={key} value={key} label={key.replace("-", " ")} />
-        ))}
+        <Tab value="own-shop" label="Yours" />
+        <Tab value="derris-shop" label="Derris'" />
       </Tabs>
       {tab === "own-shop" && (
-        <ShopPanel
-          title="Your Shop"
-          shop={playerShop}
-          canWrite
-          canReadInternal
-        />
+        <ShopPanel title="Shop" shop={playerShop} canWrite canReadInternal />
       )}
       {tab === "derris-shop" && (
-        <ShopPanel title="Derris' Shop" shop={opponentShop} />
+        <>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              maxHeight: "256px",
+            }}
+          >
+            <Box>
+              <img
+                src={"/derris.png"}
+                alt="Derris"
+                style={{ width: "256px" }}
+              />
+            </Box>
+            <Stack
+              direction="column"
+              spacing={0.1}
+              sx={{
+                flexGrow: 1,
+              }}
+            >
+              <ChatMessagesDisplay messages={derrisChatMessages} />
+              <ChatInput
+                onSendMessage={(text) => {
+                  setDerrisChatMessages((prev) => [
+                    ...prev,
+                    {
+                      id: crypto.randomUUID(),
+                      authorName: "You",
+                      role: "user",
+                      content: text,
+                    },
+                  ]);
+                }}
+              />
+            </Stack>
+          </Stack>
+          <ShopPanel title="Derris" shop={opponentShop} />
+        </>
       )}
     </Stack>
   );

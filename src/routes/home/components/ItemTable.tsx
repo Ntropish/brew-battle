@@ -51,6 +51,7 @@ const ItemTable = ({ data, canWrite }: ItemTableProps) => {
       columns,
       data,
       ...baseTableConfig,
+      initialState: { density: "compact" },
     };
 
     if (canWrite) {

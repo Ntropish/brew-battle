@@ -58,6 +58,7 @@ const InventoryTable = ({ data, canWrite }: InventoryTableProps) => {
       columns,
       data,
       ...baseTableConfig,
+      initialState: { density: "compact" },
     };
 
     if (canWrite) {
