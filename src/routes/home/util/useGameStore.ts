@@ -52,6 +52,31 @@ interface UpgradeEquipmentArg {
   equipment: EquipmentKey;
 }
 
+export interface Shopper {
+  name: string;
+  bio: string;
+  budget: number;
+  needs: {
+    brewKey: BrewKey;
+    brewSize: BrewSize;
+    quantity: number;
+    priority: number;
+  }[];
+}
+
+interface Purchase {
+  brewKey: BrewKey;
+  brewSize: BrewSize;
+  quantity: number;
+  price: number;
+}
+
+interface PurchaseList {
+  storeKey: string;
+  shopper: Shopper;
+  purchases: Purchase[];
+}
+
 export interface GameStore {
   gameStartTime: number | null;
   stores: Record<string, PotionShop>;
@@ -64,11 +89,13 @@ export interface GameStore {
   // Market actions
   setIngredientPrices: (priceMap: Record<IngredientKey, number>) => void;
   setItemPrices: (priceMap: Record<ItemKey, number>) => void;
+  sendShopper: (shopper: Shopper) => void;
 
   // Shopkeeper actions
   orderIngredient: (arg: OrderIngredientArg) => void;
   setSellPrice: (arg: setSellPriceArg) => void;
   upgradeEquipment: (arg: UpgradeEquipmentArg) => void;
+  acceptPurchase: (purchase: PurchaseList) => void;
 }
 
 const initialShop: PotionShop = {
@@ -109,7 +136,7 @@ const initialShop: PotionShop = {
   },
 };
 
-const useGameStore = create<GameStore>()((set) => ({
+const useGameStore = create<GameStore>()((set, get) => ({
   gameStartTime: null,
   stores: {
     player: initialShop,
@@ -158,6 +185,63 @@ const useGameStore = create<GameStore>()((set) => ({
         prices[item as ItemKey] = Math.floor(Math.random() * 10) + 1;
       }
       return { itemCosts: prices };
+    });
+  },
+
+  sendShopper: (shopper) => {
+    const analysisByShop: Record<string, ShopperStoreAnalysis> =
+      Object.fromEntries(
+        Object.entries(get().stores).map(([key, shop]) => [
+          key,
+          analyzeForShopper(shop, shopper),
+        ])
+      );
+
+    const bestScore = Math.max(
+      ...Object.values(analysisByShop).map((analysis) => analysis.score)
+    );
+    const topScoringShops = Object.entries(analysisByShop).filter(
+      ([_, analysis]) => analysis.score === bestScore
+    );
+    const bestScoringShop =
+      topScoringShops[Math.floor(Math.random() * topScoringShops.length)];
+
+    const bestPrice = Math.min(
+      ...Object.values(analysisByShop).map((analysis) => analysis.cost)
+    );
+    const topCostingShops = Object.entries(analysisByShop).filter(
+      ([_, analysis]) => analysis.cost === bestPrice
+    );
+    const bestCostingShop =
+      topCostingShops[Math.floor(Math.random() * topCostingShops.length)];
+
+    console.log(topScoringShops, topCostingShops);
+
+    if (bestScore === 0 && bestPrice === 0) {
+      console.log("No shops can fulfill the shopper's needs.");
+      return;
+    }
+
+    let chosenShop: string;
+    // If they are the same, we can just use the best scoring shop
+    if (bestScoringShop[0] === bestCostingShop[0]) {
+      chosenShop = bestScoringShop[0];
+    }
+
+    // Otherwise, use a 50/50 chance to pick between the two
+    const useBestPrice = Math.random() < 0.5;
+
+    chosenShop = useBestPrice ? bestCostingShop[0] : bestScoringShop[0];
+
+    console.log("Chosen shop:", chosenShop, analysisByShop);
+
+    // Make the purchases
+    const purchases = analysisByShop[chosenShop].purchases;
+
+    get().acceptPurchase({
+      storeKey: chosenShop,
+      shopper,
+      purchases: purchases,
     });
   },
 
@@ -216,5 +300,88 @@ const useGameStore = create<GameStore>()((set) => ({
         },
       };
     }),
+
+  acceptPurchase: ({ storeKey, shopper, purchases }) =>
+    set((state) => {
+      const shop = state.stores[storeKey];
+      const totalCost = purchases.reduce((acc, purchase) => {
+        return acc + purchase.price * purchase.quantity;
+      }, 0);
+
+      return {
+        stores: {
+          ...state.stores,
+          [storeKey]: {
+            ...shop,
+            gold: shop.gold + totalCost,
+            inventory: {
+              ...shop.inventory,
+              brews: purchases.reduce(
+                (acc, purchase) => {
+                  // acc[purchase.brewKey][purchase.brewSize] -= purchase.quantity;
+                  // Use immutable update to avoid mutating the state directly
+                  acc[purchase.brewKey] = {
+                    ...acc[purchase.brewKey],
+                    [purchase.brewSize]:
+                      (acc[purchase.brewKey][purchase.brewSize] ?? 0) -
+                      purchase.quantity,
+                  };
+                  return acc;
+                },
+                { ...shop.inventory.brews }
+              ),
+            },
+          },
+        },
+      };
+    }),
 }));
 export default useGameStore;
+
+type ShopperStoreAnalysis = {
+  score: number;
+  cost: number;
+  purchases: Purchase[];
+};
+
+const analyzeForShopper = (
+  shop: PotionShop,
+  shopper: Shopper
+): ShopperStoreAnalysis => {
+  let cost = 0;
+  let score = 0;
+  const purchases: Purchase[] = [];
+
+  const prioritizedNeeds = [...shopper.needs].sort(
+    (a, b) => b.priority - a.priority
+  );
+
+  for (const need of prioritizedNeeds) {
+    const brewCount = shop.inventory.brews[need.brewKey][need.brewSize];
+    const brewPrice = shop.sellPrices[need.brewKey][need.brewSize];
+    const maxAffordable = Math.floor((shopper.budget - cost) / brewPrice);
+    const willBuy = Math.min(need.quantity, brewCount, maxAffordable);
+
+    if (willBuy <= 0) {
+      continue;
+    }
+
+    // Add the purchase to the list
+    purchases.push({
+      brewKey: need.brewKey,
+      brewSize: need.brewSize,
+      quantity: willBuy,
+      price: brewPrice,
+    });
+
+    // Update the cost and score
+    cost += brewPrice * willBuy;
+    score += need.priority * willBuy;
+  }
+
+  return {
+    score,
+    cost,
+    purchases,
+  };
+};

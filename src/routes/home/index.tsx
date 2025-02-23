@@ -1,10 +1,12 @@
 import React from "react";
 import { Stack, Tabs, Tab } from "@mui/material";
 
-import useGameStore, { PotionShop } from "./util/useGameStore";
+import useGameStore, { PotionShop, Shopper } from "./util/useGameStore";
 import ShopPanel from "./components/ShopPanel";
 
 import CompetitorShopPanel from "./components/CompetitorShopPanel";
+
+import { faker } from "@faker-js/faker";
 
 type Tab = "own-shop" | "derris-shop";
 
@@ -20,6 +22,16 @@ export default function Home() {
   const opponentShop: PotionShop = stores.derris;
 
   const [tab, setTab] = React.useState<Tab>("own-shop");
+
+  // every 1s, generate a random shopper
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      const shopper = generateRandomShopper();
+      useGameStore.getState().sendShopper(shopper);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   // const handleOrderIngredient = (values: {
@@ -83,3 +95,34 @@ export default function Home() {
     </Stack>
   );
 }
+
+// interface Shopper {
+//   name: string;
+//   bio: string;
+//   budget: number;
+//   needs: {
+//     brewKey: BrewKey;
+//     brewSize: BrewSize;
+//     quantity: number;
+//     priority: number;
+//   }[];
+// }
+
+const generateRandomShopper = (): Shopper => {
+  const brewKey = "healing-potion"; // "Randomly" select a brew key
+  const brewSize = "2"; // "Randomly" select a brew size
+  const quantity = Math.floor(Math.random() * 3) + 1;
+  return {
+    name: faker.person.fullName(),
+    bio: faker.person.jobDescriptor(),
+    budget: Math.floor(Math.random() * 100) + 1,
+    needs: [
+      {
+        brewKey,
+        brewSize,
+        quantity,
+        priority: 1,
+      },
+    ],
+  };
+};
