@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { ItemKey } from "../../../data/items";
+import { bottleItemKeyByBrewSize, ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
-import { BrewKey, BrewSize } from "../../../data/brew";
+import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { EquipmentKey } from "../../../data/equipment";
 
 // const ingredientKeys = [
@@ -24,6 +24,16 @@ import { EquipmentKey } from "../../../data/equipment";
 //   "invisibility-potion",
 // ];
 
+export type Cauldron = {
+  level: number;
+  size: number;
+  brewingRecipes: {
+    brewKey: BrewKey;
+    brewSize: BrewSize;
+    quantity: number;
+  };
+};
+
 export interface PotionShop {
   gold: number;
   inventory: {
@@ -31,6 +41,7 @@ export interface PotionShop {
     ingredients: Record<IngredientKey, number>;
     brews: Record<BrewKey, Record<BrewSize, number>>;
   };
+  cauldrons: Cauldron[];
   equipment: Record<EquipmentKey, number>;
   sellPrices: Record<BrewKey, Record<BrewSize, number>>;
 }
@@ -129,10 +140,10 @@ const initialShop: PotionShop = {
     "alchemy-table": 0,
   },
   sellPrices: {
-    "healing-potion": { 2: 6, 4: 11, 8: 21 },
-    "mana-potion": { 2: 8, 4: 15, 8: 29 },
-    "strength-potion": { 2: 10, 4: 19, 8: 37 },
-    "invisibility-potion": { 2: 12, 4: 23, 8: 45 },
+    "healing-potion": { 1: 6, 3: 11, 7: 21 },
+    "mana-potion": { 1: 8, 3: 15, 7: 29 },
+    "strength-potion": { 1: 10, 3: 19, 7: 37 },
+    "invisibility-potion": { 1: 12, 3: 23, 7: 45 },
   },
 };
 
@@ -384,4 +395,56 @@ const analyzeForShopper = (
     cost,
     purchases,
   };
+};
+
+// export type BrewRecipe = {
+//   name: string;
+//   description: string;
+//   ingredients: IngredientKey[];
+//   requirements: {
+//     cauldron: number;
+//     brewingStand: number;
+//     alchemyTable: number;
+//   };
+//   appearance: {
+//     hue: number;
+//     saturation: number;
+//     brightness: number;
+//     opacity: number;
+//     emissive: number;
+//   };
+// };
+
+export const canCreateBrew = (
+  brewKey: BrewKey,
+  brewSize: BrewSize,
+  shop: PotionShop
+) => {
+  const recipe = recipeMap[brewKey];
+
+  // Check if the shop has the required equipment
+  for (const [equipmentKey, requiredLevel] of Object.entries(
+    recipe.requirements
+  )) {
+    if ((shop.equipment[equipmentKey as EquipmentKey] ?? 0) < requiredLevel) {
+      return false;
+    }
+  }
+
+  // Check if the shop has the required ingredients
+  for (const ingredient of recipe.ingredients) {
+    if ((shop.inventory.ingredients[ingredient] ?? 0) < parseInt(brewSize)) {
+      return false;
+    }
+  }
+
+  // Check if the shop has a bottle of the correct size
+  const bottleKey = bottleItemKeyByBrewSize[brewSize];
+  const bottlesAvailable = shop.inventory.items[bottleKey] ?? 0;
+  if (bottlesAvailable < 1) {
+    return false;
+  }
+
+  // If all checks pass, the brew can be created
+  return true;
 };

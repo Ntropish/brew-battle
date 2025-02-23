@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { BrewSize } from "./brew";
 
 type Consumable = {
   name: string;
@@ -11,6 +12,12 @@ export const itemKeySchema = z.enum([
   "medium-bottle",
   "large-bottle",
 ]);
+
+export const bottleItemKeyByBrewSize: Record<BrewSize, ItemKey> = {
+  1: "small-bottle",
+  3: "medium-bottle",
+  7: "large-bottle",
+};
 
 export const itemKeys = itemKeySchema.options as [ItemKey, ...ItemKey[]];
 

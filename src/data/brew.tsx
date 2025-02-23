@@ -30,25 +30,25 @@ export const brewKeys = brewKeySchema.options as [BrewKey, ...BrewKey[]];
 
 export type BrewKey = z.infer<typeof brewKeySchema>;
 
-// export type BrewSize = 2 | 4 | 8;
+// export type BrewSize = 1 | 3 | 7;
 
-export const brewSizeSchema = z.enum(["2", "4", "8"]);
+export const brewSizeSchema = z.enum(["1", "3", "7"]);
 
 export type BrewSize = z.infer<typeof brewSizeSchema>;
 
 export const brewSizeNameMap: Record<BrewSize, string> = {
-  2: "Small",
-  4: "Medium",
-  8: "Large",
+  1: "Small",
+  3: "Medium",
+  7: "Large",
 };
 
 export const brewSizeAbbreviationMap: Record<BrewSize, string> = {
-  2: "S",
-  4: "M",
-  8: "L",
+  1: "S",
+  3: "M",
+  7: "L",
 };
 
-export type Recipe = {
+export type BrewRecipe = {
   name: string;
   description: string;
   ingredients: IngredientKey[];
@@ -66,7 +66,7 @@ export type Recipe = {
   };
 };
 
-export const recipeMap: Record<string, Recipe> = {
+export const recipeMap: Record<string, BrewRecipe> = {
   "healing-potion": {
     name: "Healing Potion",
     description:
