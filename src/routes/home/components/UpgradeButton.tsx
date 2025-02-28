@@ -7,12 +7,14 @@ type UpgradeButtonProps = {
   onBuy: () => void;
   upgradeCost: number;
   getDeliveryTime: () => Date;
+  disabled?: boolean;
 };
 
 const UpgradeButton = ({
   onBuy,
   upgradeCost,
   getDeliveryTime,
+  disabled = false,
 }: UpgradeButtonProps) => {
   const deliveryTime = getDeliveryTime();
 
@@ -30,7 +32,7 @@ const UpgradeButton = ({
   return (
     <>
       <Tooltip title={tooltipTitle} placement="bottom" arrow>
-        <Button onClick={() => onBuy()}>
+        <Button onClick={() => onBuy()} disabled={disabled}>
           <Stack direction="row" sx={{}}>
             <Box
               sx={{

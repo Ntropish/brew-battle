@@ -8,20 +8,21 @@ import {
 import { addMinutes } from "date-fns";
 import { baseTableConfig } from "../util/materialReactTable";
 import UpgradeButton from "./UpgradeButton";
-import { SxProps } from "@mui/material";
+import useGameStore from "../util/useGameStore";
 
 export type EquipmentRow = {
+  key: string;
   name: string;
   description: string;
   upgradeCost: number;
-  sx: SxProps;
 };
 
 type EquipmentTableProps = {
   data: EquipmentRow[];
+  keeper?: "player" | "derris";
 };
 
-const EquipmentTable = ({ data }: EquipmentTableProps) => {
+const EquipmentTable = ({ data, keeper = "player" }: EquipmentTableProps) => {
   const columns = useMemo<MRT_ColumnDef<EquipmentRow>[]>(
     () => [
       {
@@ -40,6 +41,8 @@ const EquipmentTable = ({ data }: EquipmentTableProps) => {
     return addMinutes(new Date(), 5);
   };
 
+  const keeperGold = useGameStore((state) => state.stores[keeper].gold);
+
   const tableConfig = useMemo(() => {
     const config: MRT_TableOptions<EquipmentRow> = {
       columns,
@@ -51,14 +54,20 @@ const EquipmentTable = ({ data }: EquipmentTableProps) => {
     config.enableRowActions = true;
     config.renderRowActions = ({ row }) => [
       <UpgradeButton
-        onBuy={() => console.info("Upgrade", row.getValue("name"))}
+        disabled={row.original.upgradeCost > keeperGold}
+        onBuy={() =>
+          useGameStore.getState().purchaseEquipment({
+            keeper,
+            equipment: row.original.key,
+          })
+        }
         key={row.getValue("name")}
         upgradeCost={row.original.upgradeCost}
         getDeliveryTime={getDeliveryTime}
       />,
     ];
     return config;
-  }, [columns, data]);
+  }, [columns, data, keeper, keeperGold]);
 
   const table = useMaterialReactTable(tableConfig);
 

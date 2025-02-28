@@ -302,12 +302,19 @@ const useGameStore = create<GameStore>()((set, get) => ({
   purchaseEquipment: ({ keeper, equipment }) =>
     set((state) => {
       const shop = state.stores[keeper];
+      const gold = shop.gold - equipmentMap[equipment].price;
+
+      if (gold < 0) {
+        console.error("Not enough gold to purchase equipment");
+        return state;
+      }
+
       return {
         stores: {
           ...state.stores,
           [keeper]: {
             ...shop,
-            gold: shop.gold - equipmentMap[equipment].price,
+            gold,
             equipment: {
               ...shop.equipment,
               [equipment]: true,
@@ -322,6 +329,7 @@ const useGameStore = create<GameStore>()((set, get) => ({
 
     // verify that all equipment.requirements are met
     return Object.entries(equipmentMap)
+      .filter(([key]) => !owndedEquipmentMap[key as EquipmentKey])
       .filter(([, equipment]) =>
         equipment.requirements.every((req) => owndedEquipmentMap[req])
       )
