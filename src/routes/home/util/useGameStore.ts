@@ -53,8 +53,9 @@ interface OrderIngredientArg {
 
 interface setSellPriceArg {
   keeper: string;
-  item: ItemKey;
-  amount: number;
+  brewKey: BrewKey;
+  brewSize: BrewSize;
+  price: number;
 }
 
 interface UpgradeEquipmentArg {
@@ -286,18 +287,20 @@ const useGameStore = create<GameStore>()((set, get) => ({
         },
       };
     }),
-  setSellPrice: ({ keeper, item, amount }) =>
+  setSellPrice: ({ keeper, brewKey, brewSize, price }) =>
     set((state) => {
       const shop = state.stores[keeper];
+      const sellPrices = { ...shop.sellPrices };
+      sellPrices[brewKey][brewSize] = price;
+
+      console.log("Setting sell price", brewKey, brewSize, price);
+      console.log({ sellPrices });
       return {
         stores: {
           ...state.stores,
           [keeper]: {
             ...shop,
-            sellPrices: {
-              ...shop.sellPrices,
-              [item]: amount,
-            },
+            sellPrices,
           },
         },
       };
@@ -358,6 +361,14 @@ const useGameStore = create<GameStore>()((set, get) => ({
         }
       }
 
+      // TODO: Check if the shop has a bottle of the correct size
+      const bottleKey = bottleItemKeyByBrewSize[brewSize];
+      const bottlesAvailable = shop.inventory.items[bottleKey] ?? 0;
+      if (bottlesAvailable < 1) {
+        console.error("Not enough bottles to create brew");
+        return state;
+      }
+
       // Update the inventory
       return {
         stores: {
@@ -381,6 +392,10 @@ const useGameStore = create<GameStore>()((set, get) => ({
                   [brewSize]:
                     (shop.inventory.brews[brewKey][brewSize] ?? 0) + 1,
                 },
+              },
+              items: {
+                ...shop.inventory.items,
+                [bottleKey]: (shop.inventory.items[bottleKey] ?? 0) - 1,
               },
             },
           },

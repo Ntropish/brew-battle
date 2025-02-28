@@ -23,6 +23,7 @@ import {
   editBrewSellPriceFormSchema,
 } from "./schema";
 import useGameStore, { PotionShop } from "../../util/useGameStore";
+import { bottleItemKeyByBrewSize } from "../../../../data/items";
 
 type BrewTableProps = {
   data: BrewRow[];
@@ -170,7 +171,13 @@ const BrewTable = ({ data }: BrewTableProps) => {
         open={editBrewPriceDialogOpen}
         onClose={() => setEditBrewPriceDialogOpen(false)}
         onSubmit={(values) => {
-          console.info("Edit Brew Sell Price", values);
+          // console.info("Edit Brew Sell Price", values);
+          useGameStore.getState().setSellPrice({
+            keeper: "player",
+            brewKey: values.brewKey,
+            brewSize: values.brewSize,
+            price: values.price,
+          });
           setEditBrewPriceDialogOpen(false);
           setDefaultEditBrewPriceValues(null);
         }}
@@ -206,6 +213,11 @@ const shopCanBrew = ({
       return !has || shop.equipment[equipmentKey];
     }
   );
+
+  const hasBottle = shop.inventory.items[bottleItemKeyByBrewSize[brewSize]] > 0;
+  if (!hasBottle) {
+    return false;
+  }
 
   return hasIngredients && hasEquipment;
 };
