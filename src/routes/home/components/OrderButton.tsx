@@ -10,6 +10,7 @@ import { Box, Chip, Stack, Tooltip } from "@mui/material";
 import { formatDistance } from "date-fns";
 
 type OrderButtonProps = {
+  playerGold: number;
   onBuy: (quantity: number) => void;
   costPerUnit: number;
   getDiscount: (quantity: number) => number;
@@ -17,6 +18,7 @@ type OrderButtonProps = {
 };
 
 const OrderButton = ({
+  playerGold,
   onBuy,
   costPerUnit,
   getDiscount,
@@ -25,6 +27,9 @@ const OrderButton = ({
   // Level 0 (index 0) corresponds to buying 1 item with no discount.
   const quantities = [1, 3, 21, 55, 144];
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const canAfford = playerGold >= costPerUnit * quantities[selectedIndex];
+
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 
@@ -70,7 +75,10 @@ const OrderButton = ({
     <>
       <ButtonGroup variant="text">
         <Tooltip title={tooltipTitle} placement="bottom" arrow>
-          <Button onClick={() => onBuy(quantities[selectedIndex])}>
+          <Button
+            onClick={() => onBuy(quantities[selectedIndex])}
+            disabled={!canAfford} // Disable if player can't afford
+          >
             <Stack
               direction="row"
               sx={{

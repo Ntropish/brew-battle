@@ -48,7 +48,7 @@ export interface PotionShop {
 interface OrderIngredientArg {
   keeper: string;
   ingredient: IngredientKey;
-  amount: number;
+  quantity: number;
 }
 
 interface setSellPriceArg {
@@ -257,22 +257,29 @@ const useGameStore = create<GameStore>()((set, get) => ({
     });
   },
 
-  orderIngredient: ({ keeper, ingredient, amount }) =>
+  orderIngredient: ({ keeper, ingredient, quantity }) =>
     set((state) => {
       const shop = state.stores[keeper];
-      const price = state.ingredientCosts[ingredient] * amount;
+      const price = state.ingredientCosts[ingredient] * quantity;
+      const gold = shop.gold - price;
+
+      if (gold < 0) {
+        console.error("Not enough gold to order ingredient");
+        return state;
+      }
+
       return {
         stores: {
           ...state.stores,
           [keeper]: {
             ...shop,
-            gold: shop.gold - price,
+            gold,
             inventory: {
               ...shop.inventory,
               ingredients: {
                 ...shop.inventory.ingredients,
                 [ingredient]:
-                  (shop.inventory.ingredients[ingredient] ?? 0) + amount,
+                  (shop.inventory.ingredients[ingredient] ?? 0) + quantity,
               },
             },
           },
