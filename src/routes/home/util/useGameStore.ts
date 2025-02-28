@@ -24,15 +24,15 @@ import { EquipmentKey, equipmentMap } from "../../../data/equipment";
 //   "invisibility-potion",
 // ];
 
-export type Cauldron = {
-  level: number;
-  size: number;
-  brewingRecipes: {
-    brewKey: BrewKey;
-    brewSize: BrewSize;
-    quantity: number;
-  };
-};
+// export type Cauldron = {
+//   level: number;
+//   size: number;
+//   brewingRecipes: {
+//     brewKey: BrewKey;
+//     brewSize: BrewSize;
+//     quantity: number;
+//   };
+// };
 
 export interface PotionShop {
   gold: number;
@@ -41,7 +41,6 @@ export interface PotionShop {
     ingredients: Record<IngredientKey, number>;
     brews: Record<BrewKey, Record<BrewSize, number>>;
   };
-  cauldrons: Cauldron[];
   equipment: Record<EquipmentKey, boolean>;
   sellPrices: Record<BrewKey, Record<BrewSize, number>>;
 }
@@ -110,6 +109,7 @@ export interface GameStore {
   orderIngredient: (order: OrderIngredientArg) => void;
   setSellPrice: (price: setSellPriceArg) => void;
   purchaseEquipment: (upgrade: UpgradeEquipmentArg) => void;
+  createBrew: (arg: { brewKey: BrewKey; brewSize: BrewSize }) => void;
 
   // responses
   acceptPurchase: (purchase: PurchaseList) => void;
@@ -143,11 +143,7 @@ const initialShop: PotionShop = {
       "invisibility-potion": { 1: 2, 3: 1, 7: 0 },
     },
   },
-  equipment: {
-    cauldron: 0,
-    "brewing-stand": 0,
-    "alchemy-table": 0,
-  },
+  equipment: {},
   sellPrices: {
     "healing-potion": { 1: 6, 3: 11, 7: 21 },
     "mana-potion": { 1: 8, 3: 15, 7: 29 },
@@ -318,6 +314,67 @@ const useGameStore = create<GameStore>()((set, get) => ({
             equipment: {
               ...shop.equipment,
               [equipment]: true,
+            },
+          },
+        },
+      };
+    }),
+  createBrew: ({
+    brewKey,
+    brewSize,
+  }: {
+    brewKey: BrewKey;
+    brewSize: BrewSize;
+  }) =>
+    set((state) => {
+      const shop = state.stores.player;
+      const recipe = recipeMap[brewKey];
+      const ingredients = recipe.ingredients;
+      const equipment = recipe.equipment;
+
+      // Check if the shop has the required ingredients
+      for (const [ingredientKey, quantity] of Object.entries(ingredients)) {
+        const requiredAmount = quantity * parseInt(brewSize);
+        if ((shop.inventory.ingredients[ingredientKey] ?? 0) < requiredAmount) {
+          console.error("Not enough ingredients to create brew");
+          return state;
+        }
+      }
+
+      // Check if the shop has the required equipment
+      for (const [equipmentKey, requiresOwnershop] of Object.entries(
+        equipment
+      )) {
+        if (requiresOwnershop && !shop.equipment[equipmentKey]) {
+          console.error("Not enough equipment to create brew");
+          return state;
+        }
+      }
+
+      // Update the inventory
+      return {
+        stores: {
+          ...state.stores,
+          player: {
+            ...shop,
+            inventory: {
+              ...shop.inventory,
+              ingredients: Object.fromEntries(
+                Object.entries(shop.inventory.ingredients).map(
+                  ([key, value]) => [
+                    key,
+                    value - (ingredients[key as IngredientKey] ?? 0),
+                  ]
+                )
+              ),
+              brews: {
+                ...shop.inventory.brews,
+                [brewKey]: {
+                  ...shop.inventory.brews[brewKey],
+                  [brewSize]:
+                    (shop.inventory.brews[brewKey][brewSize] ?? 0) + 1,
+                },
+              },
             },
           },
         },

@@ -74,8 +74,6 @@ export const recipeMap: Record<string, BrewRecipe> = {
     },
     equipment: {
       cauldron: true,
-      brewingStand: true,
-      alchemyTable: true,
     },
     appearance: {
       hue: 120,
@@ -160,16 +158,7 @@ export const KEY_5 = "KEY_5";
 export const KEY_6 = "KEY_6";
 export const KEY_7 = "KEY_7";
 
-const keyList = [
-  KEY_1,
-  KEY_2,
-  KEY_3,
-  KEY_4,
-  KEY_5,
-  KEY_6,
-  KEY_7,
-] as const;
-
+const keyList = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7] as const;
 
 export type KeyString = (typeof keyList)[number];
 

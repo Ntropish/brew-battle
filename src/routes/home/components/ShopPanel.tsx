@@ -82,10 +82,6 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
     }));
   }, [shop]);
 
-  console.log({
-    equipmentRows,
-  });
-
   const brewRows: BrewRow[] = React.useMemo(() => {
     return Object.entries(shop.inventory.brews).flatMap(([key, brew]) => {
       return Object.entries(brew).map(([size, count]) => ({

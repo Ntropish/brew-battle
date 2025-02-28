@@ -6,9 +6,14 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 
-import { BrewSize, brewSizeNameMap } from "../../../../data/brew";
+import {
+  BrewKey,
+  BrewSize,
+  brewSizeNameMap,
+  recipeMap,
+} from "../../../../data/brew";
 import { baseTableConfig } from "../../util/materialReactTable";
-import { Button } from "@mui/material";
+import { Button, Tooltip } from "@mui/material";
 
 import SellPriceCell from "./SellPriceCell";
 import EditBrewSellPriceDialog from "./EditBrewSellPriceDialog";
@@ -17,6 +22,7 @@ import {
   EditBrewSellPriceForm,
   editBrewSellPriceFormSchema,
 } from "./schema";
+import useGameStore, { PotionShop } from "../../util/useGameStore";
 
 type BrewTableProps = {
   data: BrewRow[];
@@ -116,15 +122,41 @@ const BrewTable = ({ data }: BrewTableProps) => {
     };
 
     config.enableRowActions = true;
-    config.renderRowActions = ({ row }) => [
-      <Button
-        variant="text"
-        key="brew"
-        onClick={() => console.info("Brew", row.getValue("name"))}
-      >
-        Brew
-      </Button>,
-    ];
+    config.renderRowActions = ({ row }) => {
+      const brewKey = row.getValue("brewKey") as BrewKey;
+      const brewSize = row.getValue("size") as BrewSize;
+      const shop = useGameStore.getState().stores.player;
+
+      const canBrew = shopCanBrew({
+        shop,
+        brewKey,
+        brewSize,
+      });
+
+      const recipe = recipeMap[brewKey];
+      const ingredients = recipe.ingredients;
+      const recipeText = `${Object.entries(ingredients)
+        .map(([ingredientKey, quantity]) => {
+          return `${quantity} ${ingredientKey}`;
+        })
+        .join(", ")}`;
+      return (
+        <Tooltip title={recipeText} placement="bottom" arrow>
+          <span>
+            <Button
+              disabled={!canBrew}
+              variant="text"
+              key="brew"
+              onClick={() =>
+                useGameStore.getState().createBrew({ brewKey, brewSize })
+              }
+            >
+              Brew
+            </Button>
+          </span>
+        </Tooltip>
+      );
+    };
     return config;
   }, [columns, data]);
 
@@ -148,3 +180,32 @@ const BrewTable = ({ data }: BrewTableProps) => {
 };
 
 export default BrewTable;
+
+const shopCanBrew = ({
+  shop,
+  brewKey,
+  brewSize,
+}: {
+  shop: PotionShop;
+  brewKey: string;
+  brewSize: BrewSize;
+}) => {
+  const recipe = recipeMap[brewKey];
+  const ingredients = recipe.ingredients;
+  const equipment = recipe.equipment;
+  const hasIngredients = Object.entries(ingredients).every(
+    ([ingredientKey, quantity]) => {
+      return (
+        shop.inventory.ingredients[ingredientKey] >=
+        quantity * parseInt(brewSize)
+      );
+    }
+  );
+  const hasEquipment = Object.entries(equipment).every(
+    ([equipmentKey, has]) => {
+      return !has || shop.equipment[equipmentKey];
+    }
+  );
+
+  return hasIngredients && hasEquipment;
+};

@@ -8,7 +8,7 @@ type Equipment = {
 
 export const coreEquipmentMap: Record<string, Equipment> = {
   cauldron: {
-    label: "Mystic Cauldron",
+    label: "Cauldron",
     requirements: [],
     price: 10,
     brewSpeed: 1.15,
