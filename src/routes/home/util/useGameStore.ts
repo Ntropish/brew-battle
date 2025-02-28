@@ -51,6 +51,12 @@ interface OrderIngredientArg {
   quantity: number;
 }
 
+interface OrderItemArg {
+  keeper: string;
+  item: ItemKey;
+  quantity: number;
+}
+
 interface setSellPriceArg {
   keeper: string;
   brewKey: BrewKey;
@@ -108,8 +114,10 @@ export interface GameStore {
 
   // actions
   orderIngredient: (order: OrderIngredientArg) => void;
-  setSellPrice: (price: setSellPriceArg) => void;
+  orderItem: (order: OrderItemArg) => void;
   purchaseEquipment: (upgrade: UpgradeEquipmentArg) => void;
+
+  setSellPrice: (price: setSellPriceArg) => void;
   createBrew: (arg: { brewKey: BrewKey; brewSize: BrewSize }) => void;
 
   // responses
@@ -287,14 +295,41 @@ const useGameStore = create<GameStore>()((set, get) => ({
         },
       };
     }),
+
+  orderItem: ({ keeper, item, quantity }) =>
+    set((state) => {
+      const shop = state.stores[keeper];
+      const price = state.itemCosts[item] * quantity;
+      const gold = shop.gold - price;
+
+      if (gold < 0) {
+        console.error("Not enough gold to order item");
+        return state;
+      }
+
+      return {
+        stores: {
+          ...state.stores,
+          [keeper]: {
+            ...shop,
+            gold,
+            inventory: {
+              ...shop.inventory,
+              items: {
+                ...shop.inventory.items,
+                [item]: (shop.inventory.items[item] ?? 0) + quantity,
+              },
+            },
+          },
+        },
+      };
+    }),
   setSellPrice: ({ keeper, brewKey, brewSize, price }) =>
     set((state) => {
       const shop = state.stores[keeper];
       const sellPrices = { ...shop.sellPrices };
       sellPrices[brewKey][brewSize] = price;
 
-      console.log("Setting sell price", brewKey, brewSize, price);
-      console.log({ sellPrices });
       return {
         stores: {
           ...state.stores,

@@ -8,8 +8,11 @@ import {
 import OrderButton from "./OrderButton";
 import { baseTableConfig } from "../util/materialReactTable";
 import { addMinutes } from "date-fns";
+import useGameStore from "../util/useGameStore";
+import { ItemKey } from "../../../data/items";
 
 export type ItemRow = {
+  key: string;
   name: string;
   description: string;
   quantity: number;
@@ -46,6 +49,8 @@ const ItemTable = ({ data, canWrite }: ItemTableProps) => {
     return addMinutes(new Date(), 7);
   };
 
+  const playerGold = useGameStore((state) => state.stores.player.gold);
+
   const tableConfig = useMemo(() => {
     const config: MRT_TableOptions<ItemRow> = {
       columns,
@@ -58,7 +63,14 @@ const ItemTable = ({ data, canWrite }: ItemTableProps) => {
       config.enableRowActions = true;
       config.renderRowActions = ({ row }) => [
         <OrderButton
-          onBuy={(qty) => console.info("Buy", row.getValue("name"), qty)}
+          playerGold={playerGold}
+          onBuy={(qty) => {
+            useGameStore.getState().orderItem({
+              keeper: "player",
+              item: row.original.key as ItemKey,
+              quantity: qty,
+            });
+          }}
           key={row.getValue("name")}
           costPerUnit={row.getValue("cost")}
           getDiscount={getDiscount}
