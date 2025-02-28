@@ -2561,8 +2561,6 @@ export const heavenEquipmentMap: Record<string, Equipment> = {
 export type HeavenEquipmentMapKey = keyof typeof heavenEquipmentMap;
 
 export const integrationEquipmentMap: Record<string, Equipment> = {
-  // 1. Brew Log
-  // Upstream: core "cauldron", core "mortar", core "herbRack"
   brewLog: {
     label: "Brew Log",
     requirements: ["cauldron", "mortar", "herbRack"],
@@ -2570,8 +2568,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.005,
     brewQuality: 1.03,
   },
-  // 2. Quality Register
-  // Upstream: core "thermometer", chemistry "phMeter", core "infuserVials"
   qualityRegister: {
     label: "Quality Register",
     requirements: ["thermometer", "phMeter", "infuserVials"],
@@ -2579,8 +2575,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.0,
     brewQuality: 1.05,
   },
-  // 3. Process Ledger
-  // Upstream: core "runicScales", core "timeTuner", chemistry "reagentRack"
   processLedger: {
     label: "Process Ledger",
     requirements: ["runicScales", "timeTuner", "reagentRack"],
@@ -2588,8 +2582,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.995,
     brewQuality: 1.04,
   },
-  // 4. Distillation Record
-  // Upstream: core "alembic", chemistry "distillationApparatus", vampire "bloodChalice"
   distillationRecord: {
     label: "Distillation Record",
     requirements: ["alembic", "distillationApparatus", "bloodChalice"],
@@ -2597,8 +2589,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.005,
     brewQuality: 1.06,
   },
-  // 5. Ingredient Catalog
-  // Upstream: core "herbRack", chemistry "reagentRack"
   ingredientCatalog: {
     label: "Ingredient Catalog",
     requirements: ["herbRack", "reagentRack"],
@@ -2606,8 +2596,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.0,
     brewQuality: 1.07,
   },
-  // 6. Measurement Gauge
-  // Upstream: core "thermometer", chemistry "phMeter"
   measurementGauge: {
     label: "Measurement Gauge",
     requirements: ["thermometer", "phMeter"],
@@ -2615,8 +2603,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.99,
     brewQuality: 1.08,
   },
-  // 7. Extraction Apparatus
-  // Upstream: core "cauldron", chemistry "distillationApparatus", hell "demonInfuser"
   extractionApparatus: {
     label: "Extraction Apparatus",
     requirements: ["cauldron", "distillationApparatus", "demonInfuser"],
@@ -2624,8 +2610,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.0,
     brewQuality: 1.09,
   },
-  // 8. Mixing Chamber
-  // Upstream: core "stirrer", core "mortar", core "infuserVials"
   mixingChamber: {
     label: "Mixing Chamber",
     requirements: ["stirrer", "mortar", "infuserVials"],
@@ -2633,8 +2617,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.985,
     brewQuality: 1.1,
   },
-  // 9. Refinement Module
-  // Upstream: core "catalystBurner", core "alembic", core "runicScales"
   refinementModule: {
     label: "Refinement Module",
     requirements: ["catalystBurner", "alembic", "runicScales"],
@@ -2642,8 +2624,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.0,
     brewQuality: 1.11,
   },
-  // 10. Process Monitor
-  // Upstream: core "timeTuner", core "thermometer", core "infuserVials"
   processMonitor: {
     label: "Process Monitor",
     requirements: ["timeTuner", "thermometer", "infuserVials"],
@@ -2651,8 +2631,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.99,
     brewQuality: 1.12,
   },
-  // 11. Compound Analyzer
-  // Upstream: chemistry "chromatographyStation", chemistry "massSpectrometer"
   compoundAnalyzer: {
     label: "Compound Analyzer",
     requirements: ["chromatographyStation", "massSpectrometer"],
@@ -2660,8 +2638,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.005,
     brewQuality: 1.13,
   },
-  // 12. Batch Record
-  // Upstream: core "cauldron", core "infuserVials", core "mortar"
   batchRecord: {
     label: "Batch Record",
     requirements: ["cauldron", "infuserVials", "mortar"],
@@ -2669,8 +2645,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.0,
     brewQuality: 1.14,
   },
-  // 13. Recipe Codex
-  // Upstream: wicca "tarotDeck", core "cauldron", vampire "bloodChalice"
   recipeCodex: {
     label: "Recipe Codex",
     requirements: ["tarotDeck", "cauldron", "bloodChalice"],
@@ -2678,8 +2652,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.98,
     brewQuality: 1.15,
   },
-  // 14. Purification Chamber
-  // Upstream: core "distillationApparatus", hell "demonInfuser"
   purificationChamber: {
     label: "Purification Chamber",
     requirements: ["distillationApparatus", "demonInfuser"],
@@ -2687,8 +2659,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.0,
     brewQuality: 1.16,
   },
-  // 15. Quality Controller
-  // Upstream: chemistry "phMeter", core "thermometer"
   qualityController: {
     label: "Quality Controller",
     requirements: ["phMeter", "thermometer"],
@@ -2696,8 +2666,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.98,
     brewQuality: 1.17,
   },
-  // 16. Process Regulator
-  // Upstream: chemistry "chemicalSynthesizer", core "runicScales", core "timeTuner"
   processRegulator: {
     label: "Process Regulator",
     requirements: ["chemicalSynthesizer", "runicScales", "timeTuner"],
@@ -2705,8 +2673,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.985,
     brewQuality: 1.18,
   },
-  // 17. Final Binder
-  // Upstream: core "arcaneBinder", vampire "vampiricBinder"
   finalBinder: {
     label: "Final Binder",
     requirements: ["arcaneBinder", "vampiricBinder"],
@@ -2714,8 +2680,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.0,
     brewQuality: 1.19,
   },
-  // 18. Advanced Register
-  // Upstream: core "runicScales", core "timeTuner", core "alembic"
   advancedRegister: {
     label: "Advanced Register",
     requirements: ["runicScales", "timeTuner", "alembic"],
@@ -2723,8 +2687,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 0.99,
     brewQuality: 1.2,
   },
-  // 19. Combined Apparatus
-  // Upstream: core "catalystBurner", core "mortar", core "cauldron"
   combinedApparatus: {
     label: "Combined Apparatus",
     requirements: ["catalystBurner", "mortar", "cauldron"],
@@ -2732,8 +2694,6 @@ export const integrationEquipmentMap: Record<string, Equipment> = {
     brewSpeed: 1.005,
     brewQuality: 1.21,
   },
-  // 20. Unified System
-  // Upstream: core "cauldron", chemistry "chemicalSynthesizer", vampire "bloodChalice", hell "abyssalCauldron", heaven "divineCauldron"
   unifiedSystem: {
     label: "Unified System",
     requirements: [

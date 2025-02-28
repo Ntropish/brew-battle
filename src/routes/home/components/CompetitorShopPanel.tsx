@@ -16,6 +16,7 @@ import CompetitorBrewTable from "./brew/CompetitorBrewTable";
 import { BrewRow } from "./brew/schema";
 import ChatMessagesDisplay, { Message } from "./ChatMessagesDisplay";
 import ChatInput from "./ChatInput";
+
 // This type should match the shape of your PotionShop from your Zustand store.
 
 const baseUrl = import.meta.env.BASE_URL || "brew-battle";

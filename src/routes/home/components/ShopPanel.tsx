@@ -1,4 +1,4 @@
-import React from "react";
+import React, { use } from "react";
 import {
   Paper,
   Typography,
@@ -16,7 +16,7 @@ import { ingredientMap } from "../../../data/ingredients";
 import ItemTable, { ItemRow } from "./ItemTable";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import EquipmentTable, { EquipmentRow } from "./EquipmentTable";
-import { equipmentMap } from "../../../data/equipment";
+import { equipmentDescriptionMap, equipmentMap } from "../../../data/equipment";
 import BrewTable from "./brew/BrewTable";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { BrewRow } from "./brew/schema";
@@ -60,15 +60,31 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
     }));
   }, [shop.inventory.items]);
 
-  const equipmentRows: EquipmentRow[] = React.useMemo(() => {
-    const gameStore = useGameStore.getState();
-    return Object.entries(shop.equipment).map(([key, level]) => ({
+  // const equipmentRows: EquipmentRow[] = React.useMemo(() => {
+  //   const gameStore = useGameStore.getState();
+  //   return Object.entries(shop.equipment).map(([key]) => ({
+  //     key: key,
+  //     name: equipmentMap[key]?.label,
+  //     upgradeCost: gameStore.equipmentUpgradeCosts[key] || NaN,
+  //     description: equipmentDescriptionMap[key],
+  //   }));
+  // }, [shop.equipment]);
+
+  const equipmentRows = React.useMemo(() => {
+    const calculatedItems = useGameStore
+      .getState()
+      .getPurchaseableEquipment(shop);
+    return calculatedItems.map((key) => ({
       key: key,
-      name: equipmentMap[key].name,
-      level: level,
-      upgradeCost: gameStore.equipmentUpgradeCosts[key] || NaN,
+      name: equipmentMap[key]?.label,
+      description: equipmentDescriptionMap[key],
+      upgradeCost: equipmentMap[key]?.price || NaN,
     }));
-  }, [shop.equipment]);
+  }, [shop]);
+
+  console.log({
+    equipmentRows,
+  });
 
   const brewRows: BrewRow[] = React.useMemo(() => {
     return Object.entries(shop.inventory.brews).flatMap(([key, brew]) => {

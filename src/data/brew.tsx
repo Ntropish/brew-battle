@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { IngredientKey } from "./ingredients";
+import { EquipmentKey } from "./equipment";
 
 // const ingredientKeys = [
 //     "mandrake-root",
@@ -51,12 +52,8 @@ export const brewSizeAbbreviationMap: Record<BrewSize, string> = {
 export type BrewRecipe = {
   name: string;
   description: string;
-  ingredients: IngredientKey[];
-  requirements: {
-    cauldron: number;
-    brewingStand: number;
-    alchemyTable: number;
-  };
+  ingredients: Record<IngredientKey, number>;
+  equipment: Record<EquipmentKey, boolean>;
   appearance: {
     hue: number;
     saturation: number;
@@ -71,11 +68,14 @@ export const recipeMap: Record<string, BrewRecipe> = {
     name: "Healing Potion",
     description:
       "A potion that heals wounds and restores health. Made with Yarrow and Valerian Root.",
-    ingredients: ["yarrow", "valerian-root"],
-    requirements: {
-      cauldron: 1,
-      brewingStand: 0,
-      alchemyTable: 0,
+    ingredients: {
+      yarrow: 1,
+      "valerian-root": 1,
+    },
+    equipment: {
+      cauldron: true,
+      brewingStand: true,
+      alchemyTable: true,
     },
     appearance: {
       hue: 120,
@@ -89,11 +89,14 @@ export const recipeMap: Record<string, BrewRecipe> = {
     name: "Mana Potion",
     description:
       "A potion that restores mana and magical energy. Made with Mandrake Root and Mugwort.",
-    ingredients: ["mandrake-root", "mugwort"],
-    requirements: {
-      cauldron: 1,
-      brewingStand: 0,
-      alchemyTable: 1,
+    ingredients: {
+      "mandrake-root": 1,
+      mugwort: 1,
+    },
+    equipment: {
+      cauldron: true,
+      brewingStand: true,
+      alchemyTable: true,
     },
     appearance: {
       hue: 240,
@@ -107,11 +110,15 @@ export const recipeMap: Record<string, BrewRecipe> = {
     name: "Strength Potion",
     description:
       "A potion that increases physical strength. Made with Wolfsbane and Nightshade Berries.",
-    ingredients: ["wolfsbane", "nightshade-berries"],
-    requirements: {
-      cauldron: 1,
-      brewingStand: 2,
-      alchemyTable: 1,
+
+    ingredients: {
+      wolfsbane: 1,
+      "nightshade-berries": 1,
+    },
+    equipment: {
+      cauldron: true,
+      brewingStand: true,
+      alchemyTable: true,
     },
     appearance: {
       hue: 0,
@@ -125,11 +132,15 @@ export const recipeMap: Record<string, BrewRecipe> = {
     name: "Invisibility Potion",
     description:
       "A potion that grants temporary invisibility. Made with Foxglove and St. John’s Wort.",
-    ingredients: ["foxglove", "st-john-wort"],
-    requirements: {
-      cauldron: 2,
-      brewingStand: 2,
-      alchemyTable: 3,
+
+    ingredients: {
+      foxglove: 1,
+      "st-john-wort": 1,
+    },
+    equipment: {
+      cauldron: true,
+      brewingStand: true,
+      alchemyTable: true,
     },
     appearance: {
       hue: 300,
@@ -141,6 +152,25 @@ export const recipeMap: Record<string, BrewRecipe> = {
   },
 };
 
-export type RecipeKey = keyof typeof recipeMap;
+export const KEY_1 = "KEY_1";
+export const KEY_2 = "KEY_2";
+export const KEY_3 = "KEY_3";
+export const KEY_4 = "KEY_4";
+export const KEY_5 = "KEY_5";
+export const KEY_6 = "KEY_6";
+export const KEY_7 = "KEY_7";
 
-// export const recipeKeys = Object.keys(recipeMap) as [RecipeKey, ...RecipeKey[]];
+const keyList = [
+  KEY_1,
+  KEY_2,
+  KEY_3,
+  KEY_4,
+  KEY_5,
+  KEY_6,
+  KEY_7,
+] as const;
+
+
+export type KeyString = (typeof keyList)[number];
+
+export type RecipeKey = keyof typeof recipeMap;

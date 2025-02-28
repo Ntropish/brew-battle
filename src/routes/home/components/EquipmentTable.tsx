@@ -8,11 +8,13 @@ import {
 import { addMinutes } from "date-fns";
 import { baseTableConfig } from "../util/materialReactTable";
 import UpgradeButton from "./UpgradeButton";
+import { SxProps } from "@mui/material";
 
 export type EquipmentRow = {
   name: string;
-  level: number;
+  description: string;
   upgradeCost: number;
+  sx: SxProps;
 };
 
 type EquipmentTableProps = {
@@ -27,8 +29,8 @@ const EquipmentTable = ({ data }: EquipmentTableProps) => {
         header: "Name",
       },
       {
-        accessorKey: "level",
-        header: "Level",
+        accessorKey: "description",
+        header: "description",
       },
     ],
     []

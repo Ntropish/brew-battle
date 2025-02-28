@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { bottleItemKeyByBrewSize, ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
-import { EquipmentKey } from "../../../data/equipment";
+import { EquipmentKey, equipmentMap } from "../../../data/equipment";
 
 // const ingredientKeys = [
 //   "mandrake-root",
@@ -42,7 +42,7 @@ export interface PotionShop {
     brews: Record<BrewKey, Record<BrewSize, number>>;
   };
   cauldrons: Cauldron[];
-  equipment: Record<EquipmentKey, number>;
+  equipment: Record<EquipmentKey, boolean>;
   sellPrices: Record<BrewKey, Record<BrewSize, number>>;
 }
 
@@ -102,11 +102,20 @@ export interface GameStore {
   setItemPrices: (priceMap: Record<ItemKey, number>) => void;
   sendShopper: (shopper: Shopper) => void;
 
-  // Shopkeeper actions
-  orderIngredient: (arg: OrderIngredientArg) => void;
-  setSellPrice: (arg: setSellPriceArg) => void;
-  upgradeEquipment: (arg: UpgradeEquipmentArg) => void;
+  // =============================
+  // keeper
+  // -----------------------------
+
+  // actions
+  orderIngredient: (order: OrderIngredientArg) => void;
+  setSellPrice: (price: setSellPriceArg) => void;
+  purchaseEquipment: (upgrade: UpgradeEquipmentArg) => void;
+
+  // responses
   acceptPurchase: (purchase: PurchaseList) => void;
+
+  // getters
+  getPurchaseableEquipment: (store: PotionShop) => EquipmentKey[];
 }
 
 const initialShop: PotionShop = {
@@ -128,10 +137,10 @@ const initialShop: PotionShop = {
       "st-john-wort": 7,
     },
     brews: {
-      "healing-potion": { 2: 12, 4: 3, 8: 1 },
-      "mana-potion": { 2: 4, 4: 2, 8: 1 },
-      "strength-potion": { 2: 3, 4: 2, 8: 1 },
-      "invisibility-potion": { 2: 2, 4: 1, 8: 0 },
+      "healing-potion": { 1: 12, 3: 3, 7: 1 },
+      "mana-potion": { 1: 4, 3: 2, 7: 1 },
+      "strength-potion": { 1: 3, 3: 2, 7: 1 },
+      "invisibility-potion": { 1: 2, 3: 1, 7: 0 },
     },
   },
   equipment: {
@@ -212,7 +221,7 @@ const useGameStore = create<GameStore>()((set, get) => ({
       ...Object.values(analysisByShop).map((analysis) => analysis.score)
     );
     const topScoringShops = Object.entries(analysisByShop).filter(
-      ([_, analysis]) => analysis.score === bestScore
+      ([, analysis]) => analysis.score === bestScore
     );
     const bestScoringShop =
       topScoringShops[Math.floor(Math.random() * topScoringShops.length)];
@@ -221,12 +230,10 @@ const useGameStore = create<GameStore>()((set, get) => ({
       ...Object.values(analysisByShop).map((analysis) => analysis.cost)
     );
     const topCostingShops = Object.entries(analysisByShop).filter(
-      ([_, analysis]) => analysis.cost === bestPrice
+      ([, analysis]) => analysis.cost === bestPrice
     );
     const bestCostingShop =
       topCostingShops[Math.floor(Math.random() * topCostingShops.length)];
-
-    console.log(topScoringShops, topCostingShops);
 
     if (bestScore === 0 && bestPrice === 0) {
       console.log("No shops can fulfill the shopper's needs.");
@@ -243,8 +250,6 @@ const useGameStore = create<GameStore>()((set, get) => ({
     const useBestPrice = Math.random() < 0.5;
 
     chosenShop = useBestPrice ? bestCostingShop[0] : bestScoringShop[0];
-
-    console.log("Chosen shop:", chosenShop, analysisByShop);
 
     // Make the purchases
     const purchases = analysisByShop[chosenShop].purchases;
@@ -294,7 +299,7 @@ const useGameStore = create<GameStore>()((set, get) => ({
         },
       };
     }),
-  upgradeEquipment: ({ keeper, equipment }) =>
+  purchaseEquipment: ({ keeper, equipment }) =>
     set((state) => {
       const shop = state.stores[keeper];
       return {
@@ -302,15 +307,26 @@ const useGameStore = create<GameStore>()((set, get) => ({
           ...state.stores,
           [keeper]: {
             ...shop,
-            gold: shop.gold - (shop.equipment[equipment] ?? 0) * 10, // TODO
+            gold: shop.gold - equipmentMap[equipment].price,
             equipment: {
               ...shop.equipment,
-              [equipment]: (shop.equipment[equipment] ?? 0) + 1,
+              [equipment]: true,
             },
           },
         },
       };
     }),
+
+  getPurchaseableEquipment: (shop: PotionShop) => {
+    const owndedEquipmentMap = shop.equipment;
+
+    // verify that all equipment.requirements are met
+    return Object.entries(equipmentMap)
+      .filter(([, equipment]) =>
+        equipment.requirements.every((req) => owndedEquipmentMap[req])
+      )
+      .map(([key]) => key as EquipmentKey);
+  },
 
   acceptPurchase: ({ storeKey, shopper, purchases }) =>
     set((state) => {
@@ -397,24 +413,6 @@ const analyzeForShopper = (
   };
 };
 
-// export type BrewRecipe = {
-//   name: string;
-//   description: string;
-//   ingredients: IngredientKey[];
-//   requirements: {
-//     cauldron: number;
-//     brewingStand: number;
-//     alchemyTable: number;
-//   };
-//   appearance: {
-//     hue: number;
-//     saturation: number;
-//     brightness: number;
-//     opacity: number;
-//     emissive: number;
-//   };
-// };
-
 export const canCreateBrew = (
   brewKey: BrewKey,
   brewSize: BrewSize,
@@ -423,17 +421,19 @@ export const canCreateBrew = (
   const recipe = recipeMap[brewKey];
 
   // Check if the shop has the required equipment
-  for (const [equipmentKey, requiredLevel] of Object.entries(
-    recipe.requirements
-  )) {
-    if ((shop.equipment[equipmentKey as EquipmentKey] ?? 0) < requiredLevel) {
+  for (const [equipmentKey, hasOwnership] of Object.entries(recipe.equipment)) {
+    if (
+      !hasOwnership ||
+      (shop.equipment[equipmentKey as EquipmentKey] ?? false)
+    ) {
       return false;
     }
   }
 
   // Check if the shop has the required ingredients
-  for (const ingredient of recipe.ingredients) {
-    if ((shop.inventory.ingredients[ingredient] ?? 0) < parseInt(brewSize)) {
+  for (const [ingredient, quantity] of Object.entries(recipe.ingredients)) {
+    const requiredAmount = quantity * parseInt(brewSize);
+    if ((shop.inventory.ingredients[ingredient] ?? 0) < requiredAmount) {
       return false;
     }
   }

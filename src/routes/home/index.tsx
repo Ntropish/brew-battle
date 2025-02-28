@@ -110,7 +110,7 @@ export default function Home() {
 
 const generateRandomShopper = (): Shopper => {
   const brewKey = "healing-potion"; // "Randomly" select a brew key
-  const brewSize = "2"; // "Randomly" select a brew size
+  const brewSize = "1"; // "Randomly" select a brew size
   const quantity = Math.floor(Math.random() * 3) + 1;
   return {
     name: faker.person.fullName(),
