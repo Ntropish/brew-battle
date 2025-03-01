@@ -5,11 +5,11 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import OrderButton from "./OrderButton";
-import { baseTableConfig } from "../util/materialReactTable";
+import OrderButton from "../OrderButton";
+import { baseTableConfig } from "../../util/materialReactTable";
 import { addMinutes } from "date-fns";
-import useGameStore from "../util/useGameStore";
-import { ItemKey } from "../../../data/items";
+import useGameStore from "../../util/useGameStore";
+import { ItemKey } from "../../../../data/items";
 
 export type ItemRow = {
   key: string;
@@ -79,7 +79,7 @@ const ItemTable = ({ data, canWrite }: ItemTableProps) => {
       ];
     }
     return config;
-  }, [canWrite, columns, data]);
+  }, [canWrite, columns, data, playerGold]);
 
   const table = useMaterialReactTable(tableConfig);
 

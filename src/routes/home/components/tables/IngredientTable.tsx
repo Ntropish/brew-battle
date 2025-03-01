@@ -5,10 +5,12 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import { baseTableConfig } from "../util/materialReactTable";
-import OrderButton from "./OrderButton";
-import { addMinutes } from "date-fns";
-import useGameStore, { getDiscount } from "../util/useGameStore";
+import { baseTableConfig } from "../../util/materialReactTable";
+import OrderButton from "../OrderButton";
+import useGameStore, {
+  getDeliveryTime,
+  getDiscount,
+} from "../../util/useGameStore";
 
 export type IngredientRow = {
   key: string;
@@ -47,12 +49,6 @@ const InventoryTable = ({ data, canWrite }: InventoryTableProps) => {
     ],
     []
   );
-
-  const getDeliveryTime = (qty: number) => {
-    if (qty < 10) return addMinutes(new Date(), 1);
-    if (qty < 100) return addMinutes(new Date(), 3);
-    return addMinutes(new Date(), 7);
-  };
 
   const playerGold = useGameStore((state) => state.stores.player.gold);
 

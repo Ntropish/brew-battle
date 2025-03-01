@@ -10,12 +10,12 @@ import {
 } from "@mui/material";
 
 import useGameStore, { PotionShop } from "../util/useGameStore"; // Adjust the import based on your file structure
-import IngredientTable, { IngredientRow } from "./IngredientTable";
+import IngredientTable, { IngredientRow } from "./tables/IngredientTable";
 import { ItemKey, itemMap } from "../../../data/items";
 import { ingredientMap } from "../../../data/ingredients";
-import ItemTable, { ItemRow } from "./ItemTable";
+import ItemTable, { ItemRow } from "./tables/ItemTable";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import EquipmentTable, { EquipmentRow } from "./EquipmentTable";
+import EquipmentTable, { EquipmentRow } from "./tables/EquipmentTable";
 import { equipmentDescriptionMap, equipmentMap } from "../../../data/equipment";
 import BrewTable from "./brew/BrewTable";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
@@ -202,12 +202,12 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
                   aria-controls="panel1a-content"
-                  id="ingredient-header"
+                  id="order-header"
                 >
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <img
-                      src={`${baseUrl}/ingredient.webp`}
-                      alt="brew section icon"
+                      src={`${baseUrl}/order.webp`}
+                      alt="order section icon"
                       style={{ width: "42px" }}
                     />
                     <Typography
@@ -227,6 +227,37 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                   <IngredientTable data={ingredientRows} canWrite={canWrite} />
                 </AccordionDetails>
               </Accordion>
+
+              <Accordion defaultExpanded={true}>
+                <AccordionSummary
+                  expandIcon={<ExpandMore />}
+                  aria-controls="panel1a-content"
+                  id="ingredient-header"
+                >
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <img
+                      src={`${baseUrl}/ingredient.webp`}
+                      alt="ingredient section icon"
+                      style={{ width: "42px" }}
+                    />
+                    <Typography
+                      variant="h6"
+                      color="textSecondary"
+                      sx={{
+                        fontWeight: 100,
+                      }}
+                    >
+                      Ingredients
+                    </Typography>
+                  </Stack>
+                </AccordionSummary>
+                <AccordionDetails
+                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
+                >
+                  <IngredientTable data={ingredientRows} canWrite={canWrite} />
+                </AccordionDetails>
+              </Accordion>
+
               <Accordion defaultExpanded={true}>
                 <AccordionSummary
                   expandIcon={<ExpandMore />}
@@ -236,7 +267,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <img
                       src={`${baseUrl}/items.webp`}
-                      alt="brew section icon"
+                      alt="items section icon"
                       style={{ width: "42px" }}
                     />
                     <Typography
@@ -265,7 +296,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <img
                       src={`${baseUrl}/equipment.webp`}
-                      alt="brew section icon"
+                      alt="equipment section icon"
                       style={{ width: "42px" }}
                     />
                     <Typography

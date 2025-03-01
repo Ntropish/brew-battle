@@ -1,9 +1,10 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { bottleItemKeyByBrewSize, ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { EquipmentKey, equipmentMap } from "../../../data/equipment";
-
+import { addMinutes, addSeconds } from "date-fns";
 // const ingredientKeys = [
 //   "mandrake-root",
 //   "nightshade-berries",
@@ -34,6 +35,18 @@ import { EquipmentKey, equipmentMap } from "../../../data/equipment";
 //   };
 // };
 
+export type OrderTypes = "item" | "ingredient";
+export type Order<T extends OrderTypes = OrderTypes> = {
+  id: string; // Unique ID for the order
+  keeper: string;
+  type: T;
+  key: string;
+  quantity: number;
+  cost: number;
+  deliveryTime: string;
+  isDelivered?: boolean;
+};
+
 export interface PotionShop {
   gold: number;
   inventory: {
@@ -43,6 +56,7 @@ export interface PotionShop {
   };
   equipment: Record<EquipmentKey, boolean>;
   sellPrices: Record<BrewKey, Record<BrewSize, number>>;
+  orders: Order[];
 }
 
 interface OrderIngredientArg {
@@ -122,9 +136,14 @@ export interface GameStore {
 
   // responses
   acceptPurchase: (purchase: PurchaseList) => void;
+  acceptDelivery: (order: Order) => void;
 
   // getters
   getPurchaseableEquipment: (store: PotionShop) => EquipmentKey[];
+
+  // ===
+  // helpers
+  deliverPastDue: () => void;
 }
 
 const initialShop: PotionShop = {
@@ -159,336 +178,419 @@ const initialShop: PotionShop = {
     "strength-potion": { 1: 10, 3: 19, 7: 37 },
     "invisibility-potion": { 1: 12, 3: 23, 7: 45 },
   },
+  orders: [],
 };
 
-const useGameStore = create<GameStore>()((set, get) => ({
-  gameStartTime: null,
-  stores: {
-    player: initialShop,
-    derris: initialShop,
-  },
-  ingredientCosts: {
-    "mandrake-root": 10,
-    "nightshade-berries": 15,
-    "valerian-root": 8,
-    yarrow: 5,
-    wolfsbane: 20,
-    mugwort: 7,
-    foxglove: 12,
-    "st-john-wort": 6,
-  },
+const useGameStore = create<GameStore>()(
+  persist(
+    (set, get) => {
+      // Global 5-second interval to check for upcoming deliveries.
+      setInterval(() => {
+        const now = Date.now();
+        const pendingOrders = Object.values(get().stores)
+          .flatMap((shop) => shop.orders)
+          .filter((order) => !order.isDelivered);
 
-  itemCosts: {
-    "small-bottle": 5,
-    "medium-bottle": 10,
-    "large-bottle": 15,
-  },
-
-  equipmentUpgradeCosts: {
-    cauldron: 10,
-    "brewing-stand": 20,
-    "alchemy-table": 30,
-  },
-
-  startGame: () => set({ gameStartTime: Date.now() }),
-
-  setIngredientPrices: () => {
-    set((state) => {
-      const prices = { ...state.ingredientCosts };
-      for (const ingredient of Object.keys(prices)) {
-        prices[ingredient as IngredientKey] =
-          Math.floor(Math.random() * 10) + 1;
-      }
-      return { ingredientCosts: prices };
-    });
-  },
-
-  setItemPrices: () => {
-    set((state) => {
-      const prices = { ...state.itemCosts };
-      for (const item of Object.keys(prices)) {
-        prices[item as ItemKey] = Math.floor(Math.random() * 10) + 1;
-      }
-      return { itemCosts: prices };
-    });
-  },
-
-  sendShopper: (shopper) => {
-    const analysisByShop: Record<string, ShopperStoreAnalysis> =
-      Object.fromEntries(
-        Object.entries(get().stores).map(([key, shop]) => [
-          key,
-          analyzeForShopper(shop, shopper),
-        ])
-      );
-
-    const bestScore = Math.max(
-      ...Object.values(analysisByShop).map((analysis) => analysis.score)
-    );
-    const topScoringShops = Object.entries(analysisByShop).filter(
-      ([, analysis]) => analysis.score === bestScore
-    );
-    const bestScoringShop =
-      topScoringShops[Math.floor(Math.random() * topScoringShops.length)];
-
-    const bestPrice = Math.min(
-      ...Object.values(analysisByShop).map((analysis) => analysis.cost)
-    );
-    const topCostingShops = Object.entries(analysisByShop).filter(
-      ([, analysis]) => analysis.cost === bestPrice
-    );
-    const bestCostingShop =
-      topCostingShops[Math.floor(Math.random() * topCostingShops.length)];
-
-    if (bestScore === 0 && bestPrice === 0) {
-      console.log("No shops can fulfill the shopper's needs.");
-      return;
-    }
-
-    let chosenShop: string;
-    // If they are the same, we can just use the best scoring shop
-    if (bestScoringShop[0] === bestCostingShop[0]) {
-      chosenShop = bestScoringShop[0];
-    }
-
-    // Otherwise, use a 50/50 chance to pick between the two
-    const useBestPrice = Math.random() < 0.5;
-
-    chosenShop = useBestPrice ? bestCostingShop[0] : bestScoringShop[0];
-
-    // Make the purchases
-    const purchases = analysisByShop[chosenShop].purchases;
-
-    get().acceptPurchase({
-      storeKey: chosenShop,
-      shopper,
-      purchases: purchases,
-    });
-  },
-
-  orderIngredient: ({ keeper, ingredient, quantity }) =>
-    set((state) => {
-      const shop = state.stores[keeper];
-      const price =
-        state.ingredientCosts[ingredient] *
-        quantity *
-        (1 - getDiscount(quantity));
-      const gold = shop.gold - price;
-
-      if (gold < 0) {
-        console.error("Not enough gold to order ingredient");
-        return state;
-      }
-
-      return {
-        stores: {
-          ...state.stores,
-          [keeper]: {
-            ...shop,
-            gold,
-            inventory: {
-              ...shop.inventory,
-              ingredients: {
-                ...shop.inventory.ingredients,
-                [ingredient]:
-                  (shop.inventory.ingredients[ingredient] ?? 0) + quantity,
-              },
-            },
-          },
-        },
-      };
-    }),
-
-  orderItem: ({ keeper, item, quantity }) =>
-    set((state) => {
-      const shop = state.stores[keeper];
-      const price =
-        state.itemCosts[item] * quantity * (1 - getDiscount(quantity));
-      const gold = shop.gold - price;
-
-      if (gold < 0) {
-        console.error("Not enough gold to order item");
-        return state;
-      }
-
-      return {
-        stores: {
-          ...state.stores,
-          [keeper]: {
-            ...shop,
-            gold,
-            inventory: {
-              ...shop.inventory,
-              items: {
-                ...shop.inventory.items,
-                [item]: (shop.inventory.items[item] ?? 0) + quantity,
-              },
-            },
-          },
-        },
-      };
-    }),
-  setSellPrice: ({ keeper, brewKey, brewSize, price }) =>
-    set((state) => {
-      const shop = state.stores[keeper];
-      const sellPrices = { ...shop.sellPrices };
-      sellPrices[brewKey][brewSize] = price;
-
-      return {
-        stores: {
-          ...state.stores,
-          [keeper]: {
-            ...shop,
-            sellPrices,
-          },
-        },
-      };
-    }),
-  purchaseEquipment: ({ keeper, equipment }) =>
-    set((state) => {
-      const shop = state.stores[keeper];
-      const gold = shop.gold - equipmentMap[equipment].price;
-
-      if (gold < 0) {
-        console.error("Not enough gold to purchase equipment");
-        return state;
-      }
-
-      return {
-        stores: {
-          ...state.stores,
-          [keeper]: {
-            ...shop,
-            gold,
-            equipment: {
-              ...shop.equipment,
-              [equipment]: true,
-            },
-          },
-        },
-      };
-    }),
-  createBrew: ({
-    brewKey,
-    brewSize,
-  }: {
-    brewKey: BrewKey;
-    brewSize: BrewSize;
-  }) =>
-    set((state) => {
-      const shop = state.stores.player;
-      const recipe = recipeMap[brewKey];
-      const ingredients = recipe.ingredients;
-      const equipment = recipe.equipment;
-
-      // Check if the shop has the required ingredients
-      for (const [ingredientKey, quantity] of Object.entries(ingredients)) {
-        const requiredAmount = quantity * parseInt(brewSize);
-        if ((shop.inventory.ingredients[ingredientKey] ?? 0) < requiredAmount) {
-          console.error("Not enough ingredients to create brew");
-          return state;
+        // Schedule delivery for upcoming orders.
+        const scheduledOrders = new Set<string>();
+        for (const order of pendingOrders) {
+          // Check if the order is within the next 6 seconds.
+          const deliveryTime = new Date(order.deliveryTime).getTime();
+          if (deliveryTime <= now + 6000 && !scheduledOrders.has(order.id)) {
+            // Schedule the delivery.
+            setTimeout(() => {
+              get().acceptDelivery(order);
+            }, deliveryTime - now);
+            scheduledOrders.add(order.id);
+          }
         }
-      }
+      }, 5000);
 
-      // Check if the shop has the required equipment
-      for (const [equipmentKey, requiresOwnershop] of Object.entries(
-        equipment
-      )) {
-        if (requiresOwnershop && !shop.equipment[equipmentKey]) {
-          console.error("Not enough equipment to create brew");
-          return state;
-        }
-      }
-
-      // TODO: Check if the shop has a bottle of the correct size
-      const bottleKey = bottleItemKeyByBrewSize[brewSize];
-      const bottlesAvailable = shop.inventory.items[bottleKey] ?? 0;
-      if (bottlesAvailable < 1) {
-        console.error("Not enough bottles to create brew");
-        return state;
-      }
-
-      // Update the inventory
       return {
+        gameStartTime: null,
         stores: {
-          ...state.stores,
-          player: {
-            ...shop,
-            inventory: {
-              ...shop.inventory,
-              ingredients: Object.fromEntries(
-                Object.entries(shop.inventory.ingredients).map(
-                  ([key, value]) => [
-                    key,
-                    value - (ingredients[key as IngredientKey] ?? 0),
-                  ]
-                )
-              ),
-              brews: {
-                ...shop.inventory.brews,
-                [brewKey]: {
-                  ...shop.inventory.brews[brewKey],
-                  [brewSize]:
-                    (shop.inventory.brews[brewKey][brewSize] ?? 0) + 1,
+          player: initialShop,
+          derris: initialShop,
+        },
+        ingredientCosts: {
+          "mandrake-root": 10,
+          "nightshade-berries": 15,
+          "valerian-root": 8,
+          yarrow: 5,
+          wolfsbane: 20,
+          mugwort: 7,
+          foxglove: 12,
+          "st-john-wort": 6,
+        },
+
+        itemCosts: {
+          "small-bottle": 5,
+          "medium-bottle": 10,
+          "large-bottle": 15,
+        },
+
+        equipmentUpgradeCosts: {
+          cauldron: 10,
+          "brewing-stand": 20,
+          "alchemy-table": 30,
+        },
+
+        startGame: () => set({ gameStartTime: Date.now() }),
+
+        setIngredientPrices: () => {
+          set((state) => {
+            const prices = { ...state.ingredientCosts };
+            for (const ingredient of Object.keys(prices)) {
+              prices[ingredient as IngredientKey] =
+                Math.floor(Math.random() * 10) + 1;
+            }
+            return { ingredientCosts: prices };
+          });
+        },
+
+        setItemPrices: () => {
+          set((state) => {
+            const prices = { ...state.itemCosts };
+            for (const item of Object.keys(prices)) {
+              prices[item as ItemKey] = Math.floor(Math.random() * 10) + 1;
+            }
+            return { itemCosts: prices };
+          });
+        },
+
+        sendShopper: (shopper) => {
+          const analysisByShop: Record<string, ShopperStoreAnalysis> =
+            Object.fromEntries(
+              Object.entries(get().stores).map(([key, shop]) => [
+                key,
+                analyzeForShopper(shop, shopper),
+              ])
+            );
+
+          const bestScore = Math.max(
+            ...Object.values(analysisByShop).map((analysis) => analysis.score)
+          );
+          const topScoringShops = Object.entries(analysisByShop).filter(
+            ([, analysis]) => analysis.score === bestScore
+          );
+          const bestScoringShop =
+            topScoringShops[Math.floor(Math.random() * topScoringShops.length)];
+
+          const bestPrice = Math.min(
+            ...Object.values(analysisByShop).map((analysis) => analysis.cost)
+          );
+          const topCostingShops = Object.entries(analysisByShop).filter(
+            ([, analysis]) => analysis.cost === bestPrice
+          );
+          const bestCostingShop =
+            topCostingShops[Math.floor(Math.random() * topCostingShops.length)];
+
+          if (bestScore === 0 && bestPrice === 0) {
+            console.log("No shops can fulfill the shopper's needs.");
+            return;
+          }
+
+          let chosenShop: string;
+          // If they are the same, we can just use the best scoring shop
+          if (bestScoringShop[0] === bestCostingShop[0]) {
+            chosenShop = bestScoringShop[0];
+          }
+
+          // Otherwise, use a 50/50 chance to pick between the two
+          const useBestPrice = Math.random() < 0.5;
+
+          chosenShop = useBestPrice ? bestCostingShop[0] : bestScoringShop[0];
+
+          // Make the purchases
+          const purchases = analysisByShop[chosenShop].purchases;
+
+          get().acceptPurchase({
+            storeKey: chosenShop,
+            shopper,
+            purchases: purchases,
+          });
+        },
+
+        orderIngredient: ({ keeper, ingredient, quantity }) =>
+          set((state) => {
+            const shop = state.stores[keeper];
+            const price =
+              state.ingredientCosts[ingredient] *
+              quantity *
+              (1 - getDiscount(quantity));
+            const gold = shop.gold - price;
+
+            if (gold < 0) {
+              console.error("Not enough gold to order ingredient");
+              return state;
+            }
+
+            return {
+              stores: {
+                ...state.stores,
+                [keeper]: {
+                  ...shop,
+                  gold,
+                  inventory: {
+                    ...shop.inventory,
+                    ingredients: {
+                      ...shop.inventory.ingredients,
+                      [ingredient]:
+                        (shop.inventory.ingredients[ingredient] ?? 0) +
+                        quantity,
+                    },
+                  },
                 },
               },
-              items: {
-                ...shop.inventory.items,
-                [bottleKey]: (shop.inventory.items[bottleKey] ?? 0) - 1,
-              },
-            },
-          },
-        },
-      };
-    }),
+            };
+          }),
 
-  getPurchaseableEquipment: (shop: PotionShop) => {
-    const owndedEquipmentMap = shop.equipment;
+        orderItem: ({ keeper, item, quantity }) =>
+          set((state) => {
+            const shop = state.stores[keeper];
+            const price =
+              state.itemCosts[item] * quantity * (1 - getDiscount(quantity));
+            const deliveryTime = getDeliveryTime(quantity);
 
-    // verify that all equipment.requirements are met
-    return Object.entries(equipmentMap)
-      .filter(([key]) => !owndedEquipmentMap[key as EquipmentKey])
-      .filter(([, equipment]) =>
-        equipment.requirements.every((req) => owndedEquipmentMap[req])
-      )
-      .map(([key]) => key as EquipmentKey);
-  },
+            const gold = shop.gold - price;
 
-  acceptPurchase: ({ storeKey, shopper, purchases }) =>
-    set((state) => {
-      const shop = state.stores[storeKey];
-      const totalCost = purchases.reduce((acc, purchase) => {
-        return acc + purchase.price * purchase.quantity;
-      }, 0);
+            if (gold < 0) {
+              console.error("Not enough gold to order item");
+              return state;
+            }
 
-      return {
-        stores: {
-          ...state.stores,
-          [storeKey]: {
-            ...shop,
-            gold: shop.gold + totalCost,
-            inventory: {
-              ...shop.inventory,
-              brews: purchases.reduce(
-                (acc, purchase) => {
-                  // acc[purchase.brewKey][purchase.brewSize] -= purchase.quantity;
-                  // Use immutable update to avoid mutating the state directly
-                  acc[purchase.brewKey] = {
-                    ...acc[purchase.brewKey],
-                    [purchase.brewSize]:
-                      (acc[purchase.brewKey][purchase.brewSize] ?? 0) -
-                      purchase.quantity,
-                  };
-                  return acc;
+            // Add the order to the shop's orders
+            const newOrder: Order = {
+              id: `${keeper}-${item}-${Date.now()}`,
+              keeper,
+              key: item,
+              type: "item",
+              quantity,
+              cost: price,
+              deliveryTime: deliveryTime.toISOString(),
+              isDelivered: false,
+            };
+            const orders = [...shop.orders, newOrder];
+
+            return {
+              stores: {
+                ...state.stores,
+                [keeper]: {
+                  ...shop,
+                  gold,
+                  orders,
                 },
-                { ...shop.inventory.brews }
-              ),
-            },
-          },
+              },
+            };
+          }),
+        setSellPrice: ({ keeper, brewKey, brewSize, price }) =>
+          set((state) => {
+            const shop = state.stores[keeper];
+            const sellPrices = { ...shop.sellPrices };
+            sellPrices[brewKey][brewSize] = price;
+
+            return {
+              stores: {
+                ...state.stores,
+                [keeper]: {
+                  ...shop,
+                  sellPrices,
+                },
+              },
+            };
+          }),
+        purchaseEquipment: ({ keeper, equipment }) =>
+          set((state) => {
+            const shop = state.stores[keeper];
+            const gold = shop.gold - equipmentMap[equipment].price;
+
+            if (gold < 0) {
+              console.error("Not enough gold to purchase equipment");
+              return state;
+            }
+
+            return {
+              stores: {
+                ...state.stores,
+                [keeper]: {
+                  ...shop,
+                  gold,
+                  equipment: {
+                    ...shop.equipment,
+                    [equipment]: true,
+                  },
+                },
+              },
+            };
+          }),
+        createBrew: ({
+          brewKey,
+          brewSize,
+        }: {
+          brewKey: BrewKey;
+          brewSize: BrewSize;
+        }) =>
+          set((state) => {
+            const shop = state.stores.player;
+            const recipe = recipeMap[brewKey];
+            const ingredients = recipe.ingredients;
+            const equipment = recipe.equipment;
+
+            // Check if the shop has the required ingredients
+            for (const [ingredientKey, quantity] of Object.entries(
+              ingredients
+            )) {
+              const requiredAmount = quantity * parseInt(brewSize);
+              if (
+                (shop.inventory.ingredients[ingredientKey] ?? 0) <
+                requiredAmount
+              ) {
+                console.error("Not enough ingredients to create brew");
+                return state;
+              }
+            }
+
+            // Check if the shop has the required equipment
+            for (const [equipmentKey, requiresOwnershop] of Object.entries(
+              equipment
+            )) {
+              if (requiresOwnershop && !shop.equipment[equipmentKey]) {
+                console.error("Not enough equipment to create brew");
+                return state;
+              }
+            }
+
+            // TODO: Check if the shop has a bottle of the correct size
+            const bottleKey = bottleItemKeyByBrewSize[brewSize];
+            const bottlesAvailable = shop.inventory.items[bottleKey] ?? 0;
+            if (bottlesAvailable < 1) {
+              console.error("Not enough bottles to create brew");
+              return state;
+            }
+
+            // Update the inventory
+            return {
+              stores: {
+                ...state.stores,
+                player: {
+                  ...shop,
+                  inventory: {
+                    ...shop.inventory,
+                    ingredients: Object.fromEntries(
+                      Object.entries(shop.inventory.ingredients).map(
+                        ([key, value]) => [
+                          key,
+                          value - (ingredients[key as IngredientKey] ?? 0),
+                        ]
+                      )
+                    ),
+                    brews: {
+                      ...shop.inventory.brews,
+                      [brewKey]: {
+                        ...shop.inventory.brews[brewKey],
+                        [brewSize]:
+                          (shop.inventory.brews[brewKey][brewSize] ?? 0) + 1,
+                      },
+                    },
+                    items: {
+                      ...shop.inventory.items,
+                      [bottleKey]: (shop.inventory.items[bottleKey] ?? 0) - 1,
+                    },
+                  },
+                },
+              },
+            };
+          }),
+
+        getPurchaseableEquipment: (shop: PotionShop) => {
+          const owndedEquipmentMap = shop.equipment;
+
+          // verify that all equipment.requirements are met
+          return Object.entries(equipmentMap)
+            .filter(([key]) => !owndedEquipmentMap[key as EquipmentKey])
+            .filter(([, equipment]) =>
+              equipment.requirements.every((req) => owndedEquipmentMap[req])
+            )
+            .map(([key]) => key as EquipmentKey);
+        },
+
+        acceptPurchase: ({ storeKey, shopper, purchases }) =>
+          set((state) => {
+            const shop = state.stores[storeKey];
+            const totalCost = purchases.reduce((acc, purchase) => {
+              return acc + purchase.price * purchase.quantity;
+            }, 0);
+
+            return {
+              stores: {
+                ...state.stores,
+                [storeKey]: {
+                  ...shop,
+                  gold: shop.gold + totalCost,
+                  inventory: {
+                    ...shop.inventory,
+                    brews: purchases.reduce(
+                      (acc, purchase) => {
+                        // acc[purchase.brewKey][purchase.brewSize] -= purchase.quantity;
+                        // Use immutable update to avoid mutating the state directly
+                        acc[purchase.brewKey] = {
+                          ...acc[purchase.brewKey],
+                          [purchase.brewSize]:
+                            (acc[purchase.brewKey][purchase.brewSize] ?? 0) -
+                            purchase.quantity,
+                        };
+                        return acc;
+                      },
+                      { ...shop.inventory.brews }
+                    ),
+                  },
+                },
+              },
+            };
+          }),
+        acceptDelivery: (order) =>
+          set((state) => {
+            const shop = state.stores[order.keeper];
+            switch (order.type) {
+              case "item":
+                return {
+                  stores: {
+                    ...state.stores,
+                    [order.keeper]: acceptItemDelivery(shop, order),
+                  },
+                };
+              case "ingredient":
+                return {
+                  stores: {
+                    ...state.stores,
+                    [order.keeper]: acceptIngredientDelivery(shop, order),
+                  },
+                };
+              default:
+                console.error("Unknown order type");
+                return state;
+            }
+          }),
+        deliverPastDue: () => {
+          const now = Date.now();
+          for (const shop of Object.values(get().stores)) {
+            const pastDueOrders = shop.orders.filter(
+              (order) =>
+                !order.isDelivered &&
+                new Date(order.deliveryTime).getTime() < now
+            );
+            for (const order of pastDueOrders) {
+              get().acceptDelivery(order);
+            }
+          }
         },
       };
-    }),
-}));
+    },
+    {
+      name: "order-store",
+    }
+  )
+);
 export default useGameStore;
 
 type ShopperStoreAnalysis = {
@@ -576,3 +678,58 @@ export const canCreateBrew = (
 };
 
 export const getDiscount = (qty: number) => Math.ceil((qty - 1) / 10) * 0.2;
+
+export const getDeliveryTime = (qty: number) => {
+  if (qty < 10) return addSeconds(new Date(), 1);
+  if (qty < 100) return addSeconds(new Date(), 3);
+  return addSeconds(new Date(), 7);
+};
+
+const acceptItemDelivery = (shop: PotionShop, order: Order): PotionShop => {
+  const newlyDeliveredOrder = {
+    ...order,
+    isDelivered: true,
+  };
+  return {
+    ...shop,
+    inventory: {
+      ...shop.inventory,
+      items: {
+        ...shop.inventory.items,
+        [order.key as ItemKey]:
+          (shop.inventory.items[order.key as ItemKey] ?? 0) + order.quantity,
+      },
+    },
+    orders: shop.orders.map((o) =>
+      o.id === order.id ? newlyDeliveredOrder : o
+    ),
+    gold: shop.gold - order.cost,
+  };
+};
+
+const acceptIngredientDelivery = (
+  shop: PotionShop,
+  order: Order
+): PotionShop => {
+  const newlyDeliveredOrder = {
+    ...order,
+    isDelivered: true,
+  };
+
+  return {
+    ...shop,
+    inventory: {
+      ...shop.inventory,
+      ingredients: {
+        ...shop.inventory.ingredients,
+        [order.key as IngredientKey]:
+          (shop.inventory.ingredients[order.key as IngredientKey] ?? 0) +
+          order.quantity,
+      },
+    },
+    orders: shop.orders.map((o) =>
+      o.id === order.id ? newlyDeliveredOrder : o
+    ),
+    gold: shop.gold - order.cost,
+  };
+};

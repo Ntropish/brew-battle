@@ -6,9 +6,9 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { addMinutes } from "date-fns";
-import { baseTableConfig } from "../util/materialReactTable";
-import UpgradeButton from "./UpgradeButton";
-import useGameStore from "../util/useGameStore";
+import { baseTableConfig } from "../../util/materialReactTable";
+import UpgradeButton from "../UpgradeButton";
+import useGameStore from "../../util/useGameStore";
 
 export type EquipmentRow = {
   key: string;

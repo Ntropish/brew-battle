@@ -8,6 +8,7 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import { Box, Chip, Stack, Tooltip } from "@mui/material";
 
 import { formatDistance } from "date-fns";
+import { getDeliveryTime, getDiscount } from "../util/useGameStore";
 
 type OrderButtonProps = {
   playerGold: number;
@@ -17,13 +18,7 @@ type OrderButtonProps = {
   getDeliveryTime: (quantity: number) => Date;
 };
 
-const OrderButton = ({
-  playerGold,
-  onBuy,
-  costPerUnit,
-  getDiscount,
-  getDeliveryTime,
-}: OrderButtonProps) => {
+const OrderButton = ({ playerGold, onBuy, costPerUnit }: OrderButtonProps) => {
   // Level 0 (index 0) corresponds to buying 1 item with no discount.
   const quantities = [1, 3, 21, 55, 144];
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -44,11 +39,6 @@ const OrderButton = ({
   const handleToggle = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
-  // Discount for levels > 0. (Level 0 = no discount)
-  //   const discount = selectedIndex > 0 ? selectedIndex * 2.5 : 0;
-  // new logic accounting for the getDiscount and getDeliveryTime
-  //   const discount = getDiscount(quantities[selectedIndex]);
 
   // Format the percentage discount with Web API Intl
   const discount = getDiscount(quantities[selectedIndex]);
