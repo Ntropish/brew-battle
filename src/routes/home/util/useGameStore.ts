@@ -4,7 +4,7 @@ import { bottleItemKeyByBrewSize, ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { EquipmentKey, equipmentMap } from "../../../data/equipment";
-import { addMinutes, addSeconds } from "date-fns";
+import { addSeconds } from "date-fns";
 // const ingredientKeys = [
 //   "mandrake-root",
 //   "nightshade-berries",
@@ -184,24 +184,40 @@ const initialShop: PotionShop = {
 const useGameStore = create<GameStore>()(
   persist(
     (set, get) => {
+      /**
+       * Scheduler delivers the order at its delivery time
+       * and only makes one timer for each order.
+       */
+      const scheduledOrders = new Set<string>();
+      function scheduleImminentDelivery(order: Order) {
+        // Prevent duplicate scheduling
+        if (scheduledOrders.has(order.id)) return;
+        scheduledOrders.add(order.id);
+
+        const now = Date.now();
+        const deliveryTime = new Date(order.deliveryTime).getTime();
+
+        if (deliveryTime <= now) {
+          // If the delivery time is in the past, deliver immediately
+          get().acceptDelivery(order);
+          return;
+        } else {
+          // Schedule the delivery
+          setTimeout(() => {
+            get().acceptDelivery(order);
+          }, deliveryTime - now);
+        }
+      }
       // Global 5-second interval to check for upcoming deliveries.
       setInterval(() => {
-        const now = Date.now();
         const pendingOrders = Object.values(get().stores)
           .flatMap((shop) => shop.orders)
           .filter((order) => !order.isDelivered);
 
         // Schedule delivery for upcoming orders.
-        const scheduledOrders = new Set<string>();
         for (const order of pendingOrders) {
-          // Check if the order is within the next 6 seconds.
-          const deliveryTime = new Date(order.deliveryTime).getTime();
-          if (deliveryTime <= now + 6000 && !scheduledOrders.has(order.id)) {
-            // Schedule the delivery.
-            setTimeout(() => {
-              get().acceptDelivery(order);
-            }, deliveryTime - now);
-            scheduledOrders.add(order.id);
+          if (isOrderImminent(order)) {
+            scheduleImminentDelivery(order);
           }
         }
       }, 5000);
@@ -325,21 +341,29 @@ const useGameStore = create<GameStore>()(
               return state;
             }
 
+            // Add the order to the shop's orders
+            const newOrder: Order = {
+              id: `${keeper}-${ingredient}-${Date.now()}`,
+              keeper,
+              key: ingredient,
+              type: "ingredient",
+              quantity,
+              cost: price,
+              deliveryTime: getDeliveryTime(quantity).toISOString(),
+              isDelivered: false,
+            };
+
+            if (isOrderImminent(newOrder)) {
+              scheduleImminentDelivery(newOrder);
+            }
+
             return {
               stores: {
                 ...state.stores,
                 [keeper]: {
                   ...shop,
                   gold,
-                  inventory: {
-                    ...shop.inventory,
-                    ingredients: {
-                      ...shop.inventory.ingredients,
-                      [ingredient]:
-                        (shop.inventory.ingredients[ingredient] ?? 0) +
-                        quantity,
-                    },
-                  },
+                  orders: [...shop.orders, newOrder],
                 },
               },
             };
@@ -370,7 +394,11 @@ const useGameStore = create<GameStore>()(
               deliveryTime: deliveryTime.toISOString(),
               isDelivered: false,
             };
-            const orders = [...shop.orders, newOrder];
+
+            // Schedule the delivery if it's imminent
+            if (isOrderImminent(newOrder)) {
+              scheduleImminentDelivery(newOrder);
+            }
 
             return {
               stores: {
@@ -378,7 +406,7 @@ const useGameStore = create<GameStore>()(
                 [keeper]: {
                   ...shop,
                   gold,
-                  orders,
+                  orders: [...shop.orders, newOrder],
                 },
               },
             };
@@ -732,4 +760,10 @@ const acceptIngredientDelivery = (
     ),
     gold: shop.gold - order.cost,
   };
+};
+
+const isOrderImminent = (order: Order) => {
+  const now = Date.now();
+  const deliveryTime = new Date(order.deliveryTime).getTime();
+  return deliveryTime <= now + 6000;
 };

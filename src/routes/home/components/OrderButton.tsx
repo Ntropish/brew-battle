@@ -65,43 +65,45 @@ const OrderButton = ({ playerGold, onBuy, costPerUnit }: OrderButtonProps) => {
     <>
       <ButtonGroup variant="text">
         <Tooltip title={tooltipTitle} placement="bottom" arrow>
-          <Button
-            onClick={() => onBuy(quantities[selectedIndex])}
-            disabled={!canAfford} // Disable if player can't afford
-          >
-            <Stack
-              direction="row"
-              sx={{
-                width: "7.5rem",
-              }}
+          <span>
+            <Button
+              onClick={() => onBuy(quantities[selectedIndex])}
+              disabled={!canAfford} // Disable if player can't afford
             >
-              <Badge
-                badgeContent={formattedDiscount}
-                color="success"
-                invisible={discount === 0}
+              <Stack
+                direction="row"
                 sx={{
-                  ml: 1,
-                  "& .MuiBadge-badge": {
-                    backgroundColor: "green",
-                    color: "white",
-                    fontSize: "0.7rem",
-                    height: "20px",
-                    minWidth: "20px",
-                    top: 10,
-                  },
+                  width: "7.5rem",
                 }}
               >
-                <Box
+                <Badge
+                  badgeContent={formattedDiscount}
+                  color="success"
+                  invisible={discount === 0}
                   sx={{
-                    width: "6rem",
-                    textAlign: "left",
+                    ml: 1,
+                    "& .MuiBadge-badge": {
+                      backgroundColor: "green",
+                      color: "white",
+                      fontSize: "0.7rem",
+                      height: "20px",
+                      minWidth: "20px",
+                      top: 10,
+                    },
                   }}
                 >
-                  Order {quantities[selectedIndex]}
-                </Box>
-              </Badge>
-            </Stack>
-          </Button>
+                  <Box
+                    sx={{
+                      width: "6rem",
+                      textAlign: "left",
+                    }}
+                  >
+                    Order {quantities[selectedIndex]}
+                  </Box>
+                </Badge>
+              </Stack>
+            </Button>
+          </span>
         </Tooltip>
         <Button
           size="small"
