@@ -8,7 +8,7 @@ import {
 import { baseTableConfig } from "../util/materialReactTable";
 import OrderButton from "./OrderButton";
 import { addMinutes } from "date-fns";
-import useGameStore from "../util/useGameStore";
+import useGameStore, { getDiscount } from "../util/useGameStore";
 
 export type IngredientRow = {
   key: string;
@@ -48,7 +48,6 @@ const InventoryTable = ({ data, canWrite }: InventoryTableProps) => {
     []
   );
 
-  const getDiscount = (qty: number) => Math.ceil((qty - 1) / 10) * 0.2;
   const getDeliveryTime = (qty: number) => {
     if (qty < 10) return addMinutes(new Date(), 1);
     if (qty < 100) return addMinutes(new Date(), 3);

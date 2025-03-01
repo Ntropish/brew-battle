@@ -269,7 +269,10 @@ const useGameStore = create<GameStore>()((set, get) => ({
   orderIngredient: ({ keeper, ingredient, quantity }) =>
     set((state) => {
       const shop = state.stores[keeper];
-      const price = state.ingredientCosts[ingredient] * quantity;
+      const price =
+        state.ingredientCosts[ingredient] *
+        quantity *
+        (1 - getDiscount(quantity));
       const gold = shop.gold - price;
 
       if (gold < 0) {
@@ -299,7 +302,8 @@ const useGameStore = create<GameStore>()((set, get) => ({
   orderItem: ({ keeper, item, quantity }) =>
     set((state) => {
       const shop = state.stores[keeper];
-      const price = state.itemCosts[item] * quantity;
+      const price =
+        state.itemCosts[item] * quantity * (1 - getDiscount(quantity));
       const gold = shop.gold - price;
 
       if (gold < 0) {
@@ -570,3 +574,5 @@ export const canCreateBrew = (
   // If all checks pass, the brew can be created
   return true;
 };
+
+export const getDiscount = (qty: number) => Math.ceil((qty - 1) / 10) * 0.2;
