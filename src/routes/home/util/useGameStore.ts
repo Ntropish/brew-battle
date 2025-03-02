@@ -4,7 +4,7 @@ import { bottleItemKeyByBrewSize, ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { EquipmentKey, equipmentMap } from "../../../data/equipment";
-import { addSeconds } from "date-fns";
+import { addMinutes, addSeconds } from "date-fns";
 // const ingredientKeys = [
 //   "mandrake-root",
 //   "nightshade-berries",
@@ -330,10 +330,9 @@ const useGameStore = create<GameStore>()(
         orderIngredient: ({ keeper, ingredient, quantity }) =>
           set((state) => {
             const shop = state.stores[keeper];
+            const discountMultiplier = 1 - getDiscount(quantity) / 100;
             const price =
-              state.ingredientCosts[ingredient] *
-              quantity *
-              (1 - getDiscount(quantity));
+              state.ingredientCosts[ingredient] * quantity * discountMultiplier;
             const gold = shop.gold - price;
 
             if (gold < 0) {
@@ -708,9 +707,9 @@ export const canCreateBrew = (
 export const getDiscount = (qty: number) => Math.ceil((qty - 1) / 10) * 0.2;
 
 export const getDeliveryTime = (qty: number) => {
-  if (qty < 10) return addSeconds(new Date(), 1);
-  if (qty < 100) return addSeconds(new Date(), 3);
-  return addSeconds(new Date(), 7);
+  if (qty < 10) return addMinutes(new Date(), 1);
+  if (qty < 100) return addMinutes(new Date(), 3);
+  return addMinutes(new Date(), 7);
 };
 
 const acceptItemDelivery = (shop: PotionShop, order: Order): PotionShop => {
