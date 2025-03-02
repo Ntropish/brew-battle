@@ -32,17 +32,19 @@ const UpgradeButton = ({
   return (
     <>
       <Tooltip title={tooltipTitle} placement="bottom" arrow>
-        <Button onClick={() => onBuy()} disabled={disabled}>
-          <Stack direction="row" sx={{}}>
-            <Box
-              sx={{
-                whiteSpace: "nowrap",
-              }}
-            >
-              Upgrade ({finalCost})
-            </Box>
-          </Stack>
-        </Button>
+        <span>
+          <Button onClick={() => onBuy()} disabled={disabled}>
+            <Stack direction="row" sx={{}}>
+              <Box
+                sx={{
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Upgrade ({finalCost})
+              </Box>
+            </Stack>
+          </Button>
+        </span>
       </Tooltip>
     </>
   );

@@ -5,14 +5,8 @@ import {
   useMaterialReactTable,
   type MRT_ColumnDef,
 } from "material-react-table";
-import OrderButton from "../OrderButton";
 import { baseTableConfig } from "../../util/materialReactTable";
-import {
-  addMinutes,
-  formatDistance,
-  formatDistanceToNowStrict,
-} from "date-fns";
-import useGameStore from "../../util/useGameStore";
+
 import { ItemKey, itemMap } from "../../../../data/items";
 import { ingredientMap } from "../../../../data/ingredients";
 import DeliveryTimeCell from "./DeliveryTimeCell";
@@ -44,7 +38,6 @@ const OrderTable = ({ data, canWrite }: OrderTableProps) => {
         accessorKey: "key",
         header: "Name",
         Cell: ({ cell }) => {
-          console.log(cell.row.original);
           return cell.getValue() === "item"
             ? itemMap[cell.row.original.key as ItemKey]?.name
             : ingredientMap[cell.row.original.key as ItemKey]?.name;
@@ -67,14 +60,6 @@ const OrderTable = ({ data, canWrite }: OrderTableProps) => {
 
     return columns;
   }, []);
-  const getDiscount = (qty: number) => Math.ceil((qty - 1) / 10) * 0.2;
-  const getDeliveryTime = (qty: number) => {
-    if (qty < 10) return addMinutes(new Date(), 1);
-    if (qty < 100) return addMinutes(new Date(), 3);
-    return addMinutes(new Date(), 7);
-  };
-
-  const playerGold = useGameStore((state) => state.stores.player.gold);
 
   const tableConfig = useMemo(() => {
     const config: MRT_TableOptions<OrderRow> = {
