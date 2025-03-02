@@ -343,9 +343,9 @@ const useGameStore = create<GameStore>()(
         orderItem: ({ keeper, item, quantity }) =>
           set((state) => {
             const shop = state.stores[keeper];
-            const price =
-              state.itemCosts[item] * quantity * (1 - getDiscount(quantity));
-            const deliveryTime = getDeliveryTime(quantity);
+            const discountMultiplier = 1 - getDiscount(quantity) / 100;
+            const price = state.itemCosts[item] * quantity * discountMultiplier;
+            const deliveryTime = getDeliveryTime(quantity).toISOString();
 
             const gold = shop.gold - price;
 
@@ -362,7 +362,7 @@ const useGameStore = create<GameStore>()(
               type: "item",
               quantity,
               cost: price,
-              deliveryTime: deliveryTime.toISOString(),
+              deliveryTime: deliveryTime,
               isDelivered: false,
             };
 
