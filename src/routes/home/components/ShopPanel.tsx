@@ -7,6 +7,8 @@ import {
   AccordionDetails,
   AccordionSummary,
   Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
 
 import useGameStore, { PotionShop } from "../util/useGameStore"; // Adjust the import based on your file structure
@@ -98,6 +100,11 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
     });
   }, [shop.inventory.brews, shop.sellPrices]);
 
+  const [tabIndex, setTabIndex] = React.useState(0);
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
+
   return (
     <Paper
       sx={{
@@ -169,154 +176,135 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
             <MasterPotionQuote />
           </Box>
         </Stack>
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs
+            value={tabIndex}
+            onChange={handleChange}
+            aria-label="basic tabs example"
+          >
+            <Tab
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src={`${baseUrl}/potion.webp`}
+                    alt="brew section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Brews
+                  </Typography>
+                </Stack>
+              }
+            ></Tab>
+            <Tab
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src={`${baseUrl}/ingredient.webp`}
+                    alt="ingredient section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Ingredients
+                  </Typography>
+                </Stack>
+              }
+            />
+            <Tab
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src={`${baseUrl}/items.webp`}
+                    alt="items section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Items
+                  </Typography>
+                </Stack>
+              }
+            />
+            <Tab
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src={`${baseUrl}/equipment.webp`}
+                    alt="equipment section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Equipment
+                  </Typography>
+                </Stack>
+              }
+            />
+            <Tab
+              label={
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img
+                    src={`${baseUrl}/orders.webp`}
+                    alt="order section icon"
+                    style={{ width: "42px" }}
+                  />
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{
+                      fontWeight: 100,
+                    }}
+                  >
+                    Orders
+                  </Typography>
+                </Stack>
+              }
+            />
+          </Tabs>
+        </Box>
         <Box mt={1} pb={1}>
-          <Accordion defaultExpanded={true}>
-            <AccordionSummary
-              expandIcon={<ExpandMore />}
-              aria-controls="panel1a-content"
-              id="brews-header"
-            >
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <img
-                  src={`${baseUrl}/potion.webp`}
-                  alt="brew section icon"
-                  style={{ width: "42px" }}
-                />
-                <Typography
-                  variant="h6"
-                  color="textSecondary"
-                  sx={{
-                    fontWeight: 100,
-                  }}
-                >
-                  Brews
-                </Typography>
-              </Stack>
-            </AccordionSummary>
-            <AccordionDetails sx={{ overflowY: "auto", margin: 0, padding: 0 }}>
-              <BrewTable data={brewRows} />
-            </AccordionDetails>
-          </Accordion>
           {canReadInternal && (
             <>
-              <Accordion defaultExpanded={true}>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  aria-controls="panel1a-content"
-                  id="order-header"
-                >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <img
-                      src={`${baseUrl}/orders.webp`}
-                      alt="order section icon"
-                      style={{ width: "42px" }}
-                    />
-                    <Typography
-                      variant="h6"
-                      color="textSecondary"
-                      sx={{
-                        fontWeight: 100,
-                      }}
-                    >
-                      Orders
-                    </Typography>
-                  </Stack>
-                </AccordionSummary>
-                <AccordionDetails
-                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
-                >
-                  <OrderTable data={orderRows} canWrite={canWrite} />
-                </AccordionDetails>
-              </Accordion>
+              {/* <OrderTable data={orderRows} canWrite={canWrite} /> */}
 
-              <Accordion defaultExpanded={true}>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  aria-controls="panel1a-content"
-                  id="ingredient-header"
-                >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <img
-                      src={`${baseUrl}/ingredient.webp`}
-                      alt="ingredient section icon"
-                      style={{ width: "42px" }}
-                    />
-                    <Typography
-                      variant="h6"
-                      color="textSecondary"
-                      sx={{
-                        fontWeight: 100,
-                      }}
-                    >
-                      Ingredients
-                    </Typography>
-                  </Stack>
-                </AccordionSummary>
-                <AccordionDetails
-                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
-                >
-                  <IngredientTable data={ingredientRows} canWrite={canWrite} />
-                </AccordionDetails>
-              </Accordion>
-
-              <Accordion defaultExpanded={true}>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  aria-controls="panel1a-content"
-                  id="item-header"
-                >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <img
-                      src={`${baseUrl}/items.webp`}
-                      alt="items section icon"
-                      style={{ width: "42px" }}
-                    />
-                    <Typography
-                      variant="h6"
-                      color="textSecondary"
-                      sx={{
-                        fontWeight: 100,
-                      }}
-                    >
-                      Items
-                    </Typography>
-                  </Stack>
-                </AccordionSummary>
-                <AccordionDetails
-                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
-                >
-                  <ItemTable data={itemRows} canWrite={canWrite} />
-                </AccordionDetails>
-              </Accordion>
-              <Accordion defaultExpanded={true}>
-                <AccordionSummary
-                  expandIcon={<ExpandMore />}
-                  aria-controls="panel1a-content"
-                  id="equipment-header"
-                >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <img
-                      src={`${baseUrl}/equipment.webp`}
-                      alt="equipment section icon"
-                      style={{ width: "42px" }}
-                    />
-                    <Typography
-                      variant="h6"
-                      color="textSecondary"
-                      sx={{
-                        fontWeight: 100,
-                      }}
-                    >
-                      Equipment
-                    </Typography>
-                  </Stack>
-                </AccordionSummary>
-                <AccordionDetails
-                  sx={{ overflowY: "auto", margin: 0, padding: 0 }}
-                >
-                  <EquipmentTable data={equipmentRows} />
-                </AccordionDetails>
-              </Accordion>
+              {/* brew */}
+              {tabIndex === 0 && <BrewTable data={brewRows} />}
+              {/* ingredient */}
+              {tabIndex === 1 && (
+                <IngredientTable data={ingredientRows} canWrite />
+              )}
+              {/* items */}
+              {tabIndex === 2 && (
+                <ItemTable data={itemRows} canWrite={canWrite} />
+              )}
+              {/* equipment */}
+              {tabIndex === 3 && <EquipmentTable data={equipmentRows} />}
+              {/* orders */}
+              {tabIndex === 4 && (
+                <OrderTable data={orderRows} canWrite={canWrite} />
+              )}
             </>
           )}
         </Box>
