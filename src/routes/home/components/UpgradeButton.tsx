@@ -23,8 +23,7 @@ const UpgradeButton = ({
   });
 
   const finalCost = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
+    notation: "compact",
   }).format(upgradeCost);
 
   const tooltipTitle = `Order upgrade for ${finalCost}. Arrives ${deliveryDistanceString}`;
@@ -40,7 +39,7 @@ const UpgradeButton = ({
                   whiteSpace: "nowrap",
                 }}
               >
-                Upgrade ({finalCost})
+                Upgrade
               </Box>
             </Stack>
           </Button>

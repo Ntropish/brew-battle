@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   MaterialReactTable,
   MRT_TableOptions,
@@ -9,6 +9,12 @@ import { addMinutes } from "date-fns";
 import { baseTableConfig } from "../../util/materialReactTable";
 import UpgradeButton from "../UpgradeButton";
 import useGameStore from "../../util/useGameStore";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 export type EquipmentRow = {
   key: string;
@@ -30,8 +36,14 @@ const EquipmentTable = ({ data, keeper = "player" }: EquipmentTableProps) => {
         header: "Name",
       },
       {
-        accessorKey: "description",
-        header: "description",
+        accessorKey: "upgradeCost",
+        header: "Cost",
+        Cell: ({ cell }) => {
+          const finalCost = new Intl.NumberFormat("en-US", {
+            notation: "compact",
+          }).format(cell.getValue<number>());
+          return finalCost;
+        },
       },
     ],
     []
@@ -49,6 +61,11 @@ const EquipmentTable = ({ data, keeper = "player" }: EquipmentTableProps) => {
       data,
       ...baseTableConfig,
       initialState: { density: "compact" },
+      muiTableBodyRowProps: ({ row }) => ({
+        onClick: () => {
+          setOpenRow(row.original);
+        },
+      }),
     };
 
     config.enableRowActions = true;
@@ -71,7 +88,23 @@ const EquipmentTable = ({ data, keeper = "player" }: EquipmentTableProps) => {
 
   const table = useMaterialReactTable(tableConfig);
 
-  return <MaterialReactTable table={table} />;
+  const [openRow, setOpenRow] = useState<EquipmentRow | null>(null);
+
+  return (
+    <>
+      <MaterialReactTable table={table} />
+      <Dialog
+        open={!!openRow}
+        onClose={() => setOpenRow(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>{openRow?.name} </DialogTitle>
+        <DialogContent>{openRow?.description}</DialogContent>
+        <DialogActions></DialogActions>
+      </Dialog>
+    </>
+  );
 };
 
 export default EquipmentTable;
