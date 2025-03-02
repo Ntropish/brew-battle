@@ -7,16 +7,22 @@ import {
 } from "material-react-table";
 import OrderButton from "../OrderButton";
 import { baseTableConfig } from "../../util/materialReactTable";
-import { addMinutes, formatDistance } from "date-fns";
+import {
+  addMinutes,
+  formatDistance,
+  formatDistanceToNowStrict,
+} from "date-fns";
 import useGameStore from "../../util/useGameStore";
-import { ItemKey } from "../../../../data/items";
+import { ItemKey, itemMap } from "../../../../data/items";
+import { ingredientMap } from "../../../../data/ingredients";
+import DeliveryTimeCell from "./DeliveryTimeCell";
 
 export type OrderRow = {
   key: string;
   type: "item" | "ingredient";
   quantity: number;
   cost: number;
-  deliveryTime: Date;
+  deliveryTime: string;
 };
 
 type OrderTableProps = {
@@ -35,6 +41,16 @@ const OrderTable = ({ data, canWrite }: OrderTableProps) => {
         },
       },
       {
+        accessorKey: "key",
+        header: "Name",
+        Cell: ({ cell }) => {
+          console.log(cell.row.original);
+          return cell.getValue() === "item"
+            ? itemMap[cell.row.original.key as ItemKey]?.name
+            : ingredientMap[cell.row.original.key as ItemKey]?.name;
+        },
+      },
+      {
         accessorKey: "cost",
         header: "Cost",
       },
@@ -45,13 +61,7 @@ const OrderTable = ({ data, canWrite }: OrderTableProps) => {
       {
         accessorKey: "deliveryTime",
         header: "Delivery Time",
-        Cell: ({ cell }) => {
-          const deliveryTime = cell.getValue<Date>();
-          if (!deliveryTime || isNaN(deliveryTime.getTime?.())) return "N/A";
-          return formatDistance(deliveryTime, new Date(), {
-            addSuffix: true,
-          });
-        },
+        Cell: DeliveryTimeCell,
       },
     ];
 
@@ -74,27 +84,8 @@ const OrderTable = ({ data, canWrite }: OrderTableProps) => {
       initialState: { density: "compact" },
     };
 
-    if (canWrite) {
-      config.enableRowActions = true;
-      config.renderRowActions = ({ row }) => [
-        <OrderButton
-          playerGold={playerGold}
-          onBuy={(qty) => {
-            useGameStore.getState().orderItem({
-              keeper: "player",
-              item: row.original.key as ItemKey,
-              quantity: qty,
-            });
-          }}
-          key={row.getValue("name")}
-          costPerUnit={row.getValue("cost")}
-          getDiscount={getDiscount}
-          getDeliveryTime={getDeliveryTime}
-        />,
-      ];
-    }
     return config;
-  }, [canWrite, columns, data, playerGold]);
+  }, [columns, data]);
 
   const table = useMaterialReactTable(tableConfig);
 

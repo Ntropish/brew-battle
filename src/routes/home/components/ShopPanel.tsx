@@ -1,4 +1,4 @@
-import React, { use } from "react";
+import React from "react";
 import {
   Paper,
   Typography,
@@ -15,12 +15,13 @@ import { ItemKey, itemMap } from "../../../data/items";
 import { ingredientMap } from "../../../data/ingredients";
 import ItemTable, { ItemRow } from "./tables/ItemTable";
 import ExpandMore from "@mui/icons-material/ExpandMore";
-import EquipmentTable, { EquipmentRow } from "./tables/EquipmentTable";
+import EquipmentTable from "./tables/EquipmentTable";
 import { equipmentDescriptionMap, equipmentMap } from "../../../data/equipment";
 import BrewTable from "./brew/BrewTable";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { BrewRow } from "./brew/schema";
 import MasterPotionQuote from "./MasterPotionQuote";
+import OrderTable, { OrderRow } from "./tables/OrderTable";
 
 // This type should match the shape of your PotionShop from your Zustand store.
 
@@ -49,6 +50,16 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
     }));
   }, [shop.inventory.ingredients]);
 
+  const orderRows: OrderRow[] = React.useMemo(() => {
+    return Object.entries(shop.orders).map(([, order]) => ({
+      key: order.key,
+      type: order.type,
+      quantity: order.quantity,
+      cost: order.cost,
+      deliveryTime: order.deliveryTime,
+    }));
+  }, [shop.orders]);
+
   const itemRows: ItemRow[] = React.useMemo(() => {
     const gameStore = useGameStore.getState();
     return Object.entries(shop.inventory.items).map(([key, count]) => ({
@@ -59,16 +70,6 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
       cost: gameStore.itemCosts[key as ItemKey] || NaN,
     }));
   }, [shop.inventory.items]);
-
-  // const equipmentRows: EquipmentRow[] = React.useMemo(() => {
-  //   const gameStore = useGameStore.getState();
-  //   return Object.entries(shop.equipment).map(([key]) => ({
-  //     key: key,
-  //     name: equipmentMap[key]?.label,
-  //     upgradeCost: gameStore.equipmentUpgradeCosts[key] || NaN,
-  //     description: equipmentDescriptionMap[key],
-  //   }));
-  // }, [shop.equipment]);
 
   const equipmentRows = React.useMemo(() => {
     const calculatedItems = useGameStore
@@ -206,7 +207,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 >
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <img
-                      src={`${baseUrl}/order.webp`}
+                      src={`${baseUrl}/orders.webp`}
                       alt="order section icon"
                       style={{ width: "42px" }}
                     />
@@ -217,14 +218,14 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                         fontWeight: 100,
                       }}
                     >
-                      Ingredients
+                      Orders
                     </Typography>
                   </Stack>
                 </AccordionSummary>
                 <AccordionDetails
                   sx={{ overflowY: "auto", margin: 0, padding: 0 }}
                 >
-                  <IngredientTable data={ingredientRows} canWrite={canWrite} />
+                  <OrderTable data={orderRows} canWrite={canWrite} />
                 </AccordionDetails>
               </Accordion>
 
