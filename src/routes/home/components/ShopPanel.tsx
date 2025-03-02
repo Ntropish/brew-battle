@@ -3,12 +3,12 @@ import {
   Paper,
   Typography,
   Box,
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Stack,
   Tabs,
   Tab,
+  FormGroup,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 
 import useGameStore, { PotionShop } from "../util/useGameStore"; // Adjust the import based on your file structure
@@ -16,7 +16,6 @@ import IngredientTable, { IngredientRow } from "./tables/IngredientTable";
 import { ItemKey, itemMap } from "../../../data/items";
 import { ingredientMap } from "../../../data/ingredients";
 import ItemTable, { ItemRow } from "./tables/ItemTable";
-import ExpandMore from "@mui/icons-material/ExpandMore";
 import EquipmentTable from "./tables/EquipmentTable";
 import { equipmentDescriptionMap, equipmentMap } from "../../../data/equipment";
 import BrewTable from "./brew/BrewTable";
@@ -105,6 +104,8 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
     setTabIndex(newValue);
   };
 
+  const shopIsOpen = useGameStore((state) => state.stores.player.isOpen);
+
   return (
     <Paper
       sx={{
@@ -150,20 +151,57 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
                 "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%)",
               // apply a blur
               filter: "blur(6px)",
+              zIndex: 0,
             }}
           ></Box>
           <Stack
             direction="row"
-            alignItems="center"
-            justifyContent="flex-start"
-            spacing={1}
+            alignItems="flex-end"
+            spacing={4}
+            sx={{
+              position: "relative",
+              zIndex: 1,
+            }}
           >
-            <img
-              src={`${baseUrl}/coins.webp`}
-              alt="Shop"
-              style={{ width: "32px" }}
+            <Stack direction="column" alignItems="center">
+              <img
+                src={`${baseUrl}/coins.webp`}
+                alt="Shop"
+                style={{ width: "32px" }}
+              />
+              <Typography variant="subtitle1">
+                {Math.floor(shop.gold)} GP
+              </Typography>
+            </Stack>
+            <FormControlLabel
+              control={
+                <Switch
+                  color={"success"}
+                  checked={shopIsOpen}
+                  onChange={(e) => {
+                    useGameStore.setState((state) => ({
+                      stores: {
+                        ...state.stores,
+                        player: {
+                          ...state.stores.player,
+                          isOpen: e.target.checked,
+                        },
+                      },
+                    }));
+                  }}
+                />
+              }
+              slotProps={{
+                typography: {
+                  color: "text.secondary",
+                },
+              }}
+              label={
+                <Typography variant="subtitle1">
+                  {shopIsOpen ? "Shop Open" : "Shop Closed"}
+                </Typography>
+              }
             />
-            <Typography variant="subtitle1">{shop.gold} GP</Typography>
           </Stack>
           <Box
             sx={{
@@ -287,21 +325,14 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         <Box mt={1} pb={1}>
           {canReadInternal && (
             <>
-              {/* <OrderTable data={orderRows} canWrite={canWrite} /> */}
-
-              {/* brew */}
               {tabIndex === 0 && <BrewTable data={brewRows} />}
-              {/* ingredient */}
               {tabIndex === 1 && (
                 <IngredientTable data={ingredientRows} canWrite />
               )}
-              {/* items */}
               {tabIndex === 2 && (
                 <ItemTable data={itemRows} canWrite={canWrite} />
               )}
-              {/* equipment */}
               {tabIndex === 3 && <EquipmentTable data={equipmentRows} />}
-              {/* orders */}
               {tabIndex === 4 && (
                 <OrderTable data={orderRows} canWrite={canWrite} />
               )}

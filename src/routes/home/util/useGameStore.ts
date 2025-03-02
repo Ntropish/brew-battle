@@ -4,36 +4,7 @@ import { bottleItemKeyByBrewSize, ItemKey } from "../../../data/items";
 import { IngredientKey } from "../../../data/ingredients";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
 import { EquipmentKey, equipmentMap } from "../../../data/equipment";
-import { addMinutes, addSeconds } from "date-fns";
-// const ingredientKeys = [
-//   "mandrake-root",
-//   "nightshade-berries",
-//   "valerian-root",
-//   "yarrow",
-//   "wolfsbane",
-//   "mugwort",
-//   "foxglove",
-//   "st-john-wort",
-// ];
-
-// const equipmentKeys = ["cauldron", "brewing-stand", "alchemy-table"] as const;
-
-// export const recipeKeys = [
-//   "healing-potion",
-//   "mana-potion",
-//   "strength-potion",
-//   "invisibility-potion",
-// ];
-
-// export type Cauldron = {
-//   level: number;
-//   size: number;
-//   brewingRecipes: {
-//     brewKey: BrewKey;
-//     brewSize: BrewSize;
-//     quantity: number;
-//   };
-// };
+import { addMinutes } from "date-fns";
 
 export type OrderTypes = "item" | "ingredient";
 export type Order<T extends OrderTypes = OrderTypes> = {
@@ -48,6 +19,7 @@ export type Order<T extends OrderTypes = OrderTypes> = {
 };
 
 export interface PotionShop {
+  isOpen: boolean;
   gold: number;
   inventory: {
     items: Record<ItemKey, number>;
@@ -633,6 +605,14 @@ const analyzeForShopper = (
   let cost = 0;
   let score = 0;
   const purchases: Purchase[] = [];
+
+  if (!shop.isOpen) {
+    return {
+      score: 0,
+      cost: 0,
+      purchases: [],
+    };
+  }
 
   const prioritizedNeeds = [...shopper.needs].sort(
     (a, b) => b.priority - a.priority
