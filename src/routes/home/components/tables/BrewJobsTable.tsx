@@ -7,7 +7,12 @@ import {
 } from "material-react-table";
 import { baseTableConfig } from "../../util/materialReactTable";
 
-import { recipeMap } from "../../../../data/brew";
+import {
+  BrewKey,
+  BrewSize,
+  recipeMap,
+  brewSizeNameMap,
+} from "../../../../data/brew";
 import useGameStore from "../../util/useGameStore";
 import { LinearProgress } from "@mui/material";
 import { Tooltip } from "@mui/material";
@@ -16,6 +21,8 @@ export type TaskRow = {
   key: string;
   type: "brew";
   quantity: number;
+  brewKey: BrewKey;
+  brewSize: BrewSize;
   status: "scheduled" | "in-progress" | "completed";
   effortRemaining: number;
   effortRequired: number;
@@ -23,50 +30,62 @@ export type TaskRow = {
 
 const TasksTable = () => {
   const [data, setData] = useState<TaskRow[]>([]);
+
+  // Tasks Table Rows are derived from the player's task queue, active task, and completed tasks
+  function updateData() {
+    const state = useGameStore.getState();
+
+    const queuedTasks: TaskRow[] = state.stores.player.taskQueue.map(
+      (task) => ({
+        key: task.id,
+        type: "brew",
+        quantity: task.quantity,
+        brewKey: task.brewKey,
+        brewSize: task.brewSize,
+        status: "scheduled",
+        effortRemaining: task.effortRemaining,
+        effortRequired: task.effortRequired,
+      })
+    );
+
+    const activeTask = state.stores.player.activeTask;
+    const activeTaskRow: TaskRow | null = activeTask
+      ? {
+          key: state.stores.player.activeTask!.id,
+          type: "brew",
+          quantity: state.stores.player.activeTask!.quantity,
+          brewKey: state.stores.player.activeTask!.brewKey,
+          brewSize: state.stores.player.activeTask!.brewSize,
+          status: "in-progress",
+          effortRemaining: state.stores.player.activeTask!.effortRemaining,
+          effortRequired: state.stores.player.activeTask!.effortRequired,
+        }
+      : null;
+
+    const completedTasks: TaskRow[] = state.stores.player.completedTasks.map(
+      (task) => ({
+        key: task.id,
+        type: "brew",
+        quantity: task.quantity,
+        brewKey: task.brewKey,
+        brewSize: task.brewSize,
+        status: "completed",
+        effortRemaining: 0,
+        effortRequired: task.effortRequired,
+      })
+    );
+
+    if (activeTaskRow) {
+      setData([...queuedTasks, activeTaskRow, ...completedTasks]);
+    } else {
+      setData([...queuedTasks, ...completedTasks]);
+    }
+  }
   // Update the data once per second
   useEffect(() => {
+    updateData();
     const interval = setInterval(() => {
-      const state = useGameStore.getState();
-
-      const queuedTasks: TaskRow[] = state.stores.player.taskQueue.map(
-        (task) => ({
-          key: task.id,
-          type: "brew",
-          quantity: task.quantity,
-          status: "scheduled",
-          effortRemaining: task.effortRemaining,
-          effortRequired: task.effortRequired,
-        })
-      );
-
-      const activeTask = state.stores.player.activeTask;
-      const activeTaskRow: TaskRow | null = activeTask
-        ? {
-            key: state.stores.player.activeTask!.id,
-            type: "brew",
-            quantity: state.stores.player.activeTask!.quantity,
-            status: "in-progress",
-            effortRemaining: state.stores.player.activeTask!.effortRemaining,
-            effortRequired: state.stores.player.activeTask!.effortRequired,
-          }
-        : null;
-
-      const completedTasks: TaskRow[] = state.stores.player.completedTasks.map(
-        (task) => ({
-          key: task.id,
-          type: "brew",
-          quantity: task.quantity,
-          status: "completed",
-          effortRemaining: 0,
-          effortRequired: task.effortRequired,
-        })
-      );
-
-      if (activeTaskRow) {
-        setData([...queuedTasks, activeTaskRow, ...completedTasks]);
-      } else {
-        setData([...queuedTasks, ...completedTasks]);
-      }
+      updateData();
     }, 1000);
     return () => clearInterval(interval);
   }, []);
@@ -74,11 +93,23 @@ const TasksTable = () => {
   const columns = useMemo(() => {
     const columns: MRT_ColumnDef<TaskRow>[] = [
       {
-        accessorKey: "type",
-        header: "Type",
+        accessorKey: "brewKey",
+        header: "Brew",
         Cell: ({ cell }) => {
-          return cell.getValue() === "brew" ? "Brew" : "Unknown";
+          return recipeMap[cell.row.original.brewKey]?.name;
         },
+      },
+      {
+        accessorKey: "brewSize",
+        header: "Size",
+        Cell: ({ cell }) => {
+          return brewSizeNameMap[cell.row.original.brewSize];
+        },
+      },
+      {
+        accessorKey: "quantity",
+        header: "Qty.",
+        size: 50,
       },
       {
         accessorKey: "status",
@@ -123,18 +154,6 @@ const TasksTable = () => {
             </Tooltip>
           );
         },
-      },
-      {
-        accessorKey: "key",
-        header: "Name",
-        Cell: ({ cell }) => {
-          return recipeMap[cell.row.original.key]?.name;
-        },
-      },
-
-      {
-        accessorKey: "quantity",
-        header: "Quantity",
       },
     ];
 
