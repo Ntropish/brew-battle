@@ -6,7 +6,6 @@ import {
   Stack,
   Tabs,
   Tab,
-  FormGroup,
   FormControlLabel,
   Switch,
 } from "@mui/material";
@@ -18,11 +17,12 @@ import { ingredientMap } from "../../../data/ingredients";
 import ItemTable, { ItemRow } from "./tables/ItemTable";
 import EquipmentTable from "./tables/EquipmentTable";
 import { equipmentDescriptionMap, equipmentMap } from "../../../data/equipment";
-import BrewTable from "./brew/BrewTable";
+import BrewTable from "./tables/brew/BrewTable";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
-import { BrewRow } from "./brew/schema";
+import { BrewRow } from "./tables/brew/schema";
 import MasterPotionQuote from "./MasterPotionQuote";
 import OrderTable, { OrderRow } from "./tables/OrderTable";
+import TasksTable, { TaskRow } from "./tables/BrewJobsTable";
 
 // This type should match the shape of your PotionShop from your Zustand store.
 
@@ -325,7 +325,12 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
         <Box mt={1} pb={1}>
           {canReadInternal && (
             <>
-              {tabIndex === 0 && <BrewTable data={brewRows} />}
+              {tabIndex === 0 && (
+                <>
+                  <BrewTable data={brewRows} />
+                  <TasksTable />
+                </>
+              )}
               {tabIndex === 1 && (
                 <IngredientTable data={ingredientRows} canWrite />
               )}

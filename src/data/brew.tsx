@@ -51,6 +51,7 @@ export const brewSizeAbbreviationMap: Record<BrewSize, string> = {
 
 export type BrewRecipe = {
   name: string;
+  effort: number;
   description: string;
   ingredients: Record<IngredientKey, number>;
   equipment: Record<EquipmentKey, boolean>;
@@ -66,6 +67,7 @@ export type BrewRecipe = {
 export const recipeMap: Record<string, BrewRecipe> = {
   "healing-potion": {
     name: "Healing Potion",
+    effort: 1000,
     description:
       "A potion that heals wounds and restores health. Made with Yarrow and Valerian Root.",
     ingredients: {
@@ -85,6 +87,7 @@ export const recipeMap: Record<string, BrewRecipe> = {
   },
   "mana-potion": {
     name: "Mana Potion",
+    effort: 1500,
     description:
       "A potion that restores mana and magical energy. Made with Mandrake Root and Mugwort.",
     ingredients: {
@@ -106,6 +109,7 @@ export const recipeMap: Record<string, BrewRecipe> = {
   },
   "strength-potion": {
     name: "Strength Potion",
+    effort: 2000,
     description:
       "A potion that increases physical strength. Made with Wolfsbane and Nightshade Berries.",
 
@@ -128,6 +132,7 @@ export const recipeMap: Record<string, BrewRecipe> = {
   },
   "invisibility-potion": {
     name: "Invisibility Potion",
+    effort: 2500,
     description:
       "A potion that grants temporary invisibility. Made with Foxglove and St. John’s Wort.",
 
@@ -158,7 +163,15 @@ export const KEY_5 = "KEY_5";
 export const KEY_6 = "KEY_6";
 export const KEY_7 = "KEY_7";
 
-const keyList = [KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7] as const;
+export const keyList = [
+  KEY_1,
+  KEY_2,
+  KEY_3,
+  KEY_4,
+  KEY_5,
+  KEY_6,
+  KEY_7,
+] as const;
 
 export type KeyString = (typeof keyList)[number];
 

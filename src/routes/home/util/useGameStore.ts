@@ -18,6 +18,18 @@ export type Order<T extends OrderTypes = OrderTypes> = {
   isDelivered?: boolean;
 };
 
+export type BrewTask = {
+  id: string;
+  type: "brew";
+  brewKey: BrewKey;
+  brewSize: BrewSize;
+  quantity: number;
+  effortRequired: number;
+  effortRemaining: number;
+};
+
+export type Task = BrewTask;
+
 export interface PotionShop {
   isOpen: boolean;
   gold: number;
@@ -29,6 +41,10 @@ export interface PotionShop {
   equipment: Record<EquipmentKey, boolean>;
   sellPrices: Record<BrewKey, Record<BrewSize, number>>;
   orders: Order[];
+  taskQueue: Task[];
+  activeTask: Task | null;
+  completedTasks: Task[];
+  effortPerSecond: number;
 }
 
 interface OrderIngredientArg {
@@ -82,6 +98,7 @@ interface PurchaseList {
 
 export interface GameStore {
   gameStartTime: number | null;
+  lastTaskUpdate: number | null;
   stores: Record<string, PotionShop>;
   ingredientCosts: Record<IngredientKey, number>;
   itemCosts: Record<ItemKey, number>;
@@ -116,6 +133,10 @@ export interface GameStore {
   // ===
   // helpers
   deliverPastDue: () => void;
+
+  // ===
+  // task queue
+  completeTask: (arg: { keeper: string; taskId: string }) => void;
 }
 
 const initialShop: PotionShop = {
@@ -151,6 +172,11 @@ const initialShop: PotionShop = {
     "invisibility-potion": { 1: 12, 3: 23, 7: 45 },
   },
   orders: [],
+  taskQueue: [],
+  activeTask: null,
+  completedTasks: [],
+  isOpen: false,
+  effortPerSecond: 1,
 };
 
 const useGameStore = create<GameStore>()(
@@ -180,7 +206,8 @@ const useGameStore = create<GameStore>()(
           }, deliveryTime - now);
         }
       }
-      // Global 5-second interval to check for upcoming deliveries.
+
+      // Global 5-second interval to check for upcoming deliveries and tasks
       setInterval(() => {
         const pendingOrders = Object.values(get().stores)
           .flatMap((shop) => shop.orders)
@@ -194,8 +221,32 @@ const useGameStore = create<GameStore>()(
         }
       }, 5000);
 
+      // Global 1-second interval to process tasks
+      setInterval(() => {
+        set((old: GameStore) => {
+          const now = Date.now();
+          const lastTaskUpdate = old.lastTaskUpdate ?? now;
+          const timeSinceLastUpdate = now - lastTaskUpdate;
+
+          const newStores = Object.fromEntries(
+            Object.entries(old.stores).map(([keeper, shop]) => [
+              keeper,
+              processKeeperTasks(shop, timeSinceLastUpdate),
+            ])
+          );
+
+          console.log(newStores);
+
+          return {
+            lastTaskUpdate: now,
+            stores: newStores,
+          };
+        });
+      }, 1000);
+
       return {
         gameStartTime: null,
+        lastTaskUpdate: null,
         stores: {
           player: initialShop,
           derris: initialShop,
@@ -274,7 +325,6 @@ const useGameStore = create<GameStore>()(
             topCostingShops[Math.floor(Math.random() * topCostingShops.length)];
 
           if (bestScore === 0 && bestPrice === 0) {
-            console.log("No shops can fulfill the shopper's needs.");
             return;
           }
 
@@ -430,7 +480,8 @@ const useGameStore = create<GameStore>()(
           brewSize: BrewSize;
         }) =>
           set((state) => {
-            const shop = state.stores.player;
+            const keeper = "player";
+            const shop = state.stores[keeper];
             const recipe = recipeMap[brewKey];
             const ingredients = recipe.ingredients;
             const equipment = recipe.equipment;
@@ -459,7 +510,7 @@ const useGameStore = create<GameStore>()(
               }
             }
 
-            // TODO: Check if the shop has a bottle of the correct size
+            // Check if the shop has a bottle of the correct size
             const bottleKey = bottleItemKeyByBrewSize[brewSize];
             const bottlesAvailable = shop.inventory.items[bottleKey] ?? 0;
             if (bottlesAvailable < 1) {
@@ -483,22 +534,63 @@ const useGameStore = create<GameStore>()(
                         ]
                       )
                     ),
-                    brews: {
-                      ...shop.inventory.brews,
-                      [brewKey]: {
-                        ...shop.inventory.brews[brewKey],
-                        [brewSize]:
-                          (shop.inventory.brews[brewKey][brewSize] ?? 0) + 1,
-                      },
-                    },
+
                     items: {
                       ...shop.inventory.items,
                       [bottleKey]: (shop.inventory.items[bottleKey] ?? 0) - 1,
                     },
                   },
+                  taskQueue: [
+                    ...shop.taskQueue,
+                    {
+                      id: `${keeper}-${brewKey}-${brewSize}-${Date.now()}`,
+                      brewKey,
+                      brewSize,
+                      quantity: 1,
+                      type: "brew",
+                      effortRemaining: recipe.effort * parseInt(brewSize),
+                      effortRequired: recipe.effort * parseInt(brewSize),
+                    },
+                  ],
                 },
               },
             };
+          }),
+        completeTask: ({ keeper, taskId }) =>
+          set((state) => {
+            const shop = state.stores[keeper];
+            const task = shop.taskQueue.find((t) => t.id === taskId);
+            if (!task) {
+              console.error("Task not found");
+              return state;
+            }
+
+            if (task.type === "brew") {
+              const brewSize = task.brewSize;
+              const quantity = task.quantity;
+              const brewKey = task.brewKey;
+              const shop = state.stores[keeper];
+
+              const newInventory = { ...shop.inventory };
+              newInventory.brews[brewKey][brewSize] -= quantity;
+
+              const newTaskQueue = shop.taskQueue.filter(
+                (t) => t.id !== taskId
+              );
+
+              return {
+                stores: {
+                  ...state.stores,
+                  [keeper]: {
+                    ...shop,
+                    inventory: newInventory,
+                    taskQueue: newTaskQueue,
+                  },
+                },
+              };
+            }
+
+            return state;
           }),
 
         getPurchaseableEquipment: (shop: PotionShop) => {
@@ -745,4 +837,84 @@ const isOrderImminent = (order: Order) => {
   const now = Date.now();
   const deliveryTime = new Date(order.deliveryTime).getTime();
   return deliveryTime <= now + 6000;
+};
+
+const processKeeperTasks = (
+  shop: PotionShop,
+  timeSinceLastUpdate: number
+): PotionShop => {
+  // Convert milliseconds to seconds for effort calculation
+  const elapsedSeconds = timeSinceLastUpdate / 1000;
+  const effortToApply = elapsedSeconds * shop.effortPerSecond;
+
+  // If no active task and queue is empty, return unchanged shop
+  if (!shop.activeTask && shop.taskQueue.length === 0) {
+    return shop;
+  }
+
+  let currentTask = shop.activeTask;
+  let remainingTaskQueue = [...shop.taskQueue];
+  let completedTasks = [...shop.completedTasks];
+  const inventory = { ...shop.inventory };
+
+  // If no active task but queue has tasks, get next task
+  if (!currentTask && remainingTaskQueue.length > 0) {
+    currentTask = remainingTaskQueue[0];
+    remainingTaskQueue = remainingTaskQueue.slice(1);
+  }
+
+  // Process active task if exists
+  if (currentTask) {
+    if (currentTask.type === "brew") {
+      // Apply effort to the task
+      const newEffortRemaining = Math.max(
+        0,
+        currentTask.effortRemaining - effortToApply
+      );
+
+      // If task is completed
+      if (newEffortRemaining === 0) {
+        // Update inventory with completed brew
+        inventory.brews = {
+          ...inventory.brews,
+          [currentTask.brewKey]: {
+            ...inventory.brews[currentTask.brewKey],
+            [currentTask.brewSize]:
+              (inventory.brews[currentTask.brewKey][currentTask.brewSize] ||
+                0) + currentTask.quantity,
+          },
+        };
+
+        // Move task to completed tasks
+        completedTasks = [...completedTasks, currentTask];
+
+        // Get next task from queue if available
+        currentTask =
+          remainingTaskQueue.length > 0 ? remainingTaskQueue[0] : null;
+        remainingTaskQueue = remainingTaskQueue.slice(1);
+      } else {
+        // Update task with remaining effort
+        currentTask = {
+          ...currentTask,
+          effortRemaining: newEffortRemaining,
+        };
+      }
+    }
+  }
+
+  return {
+    ...shop,
+    activeTask: currentTask,
+    taskQueue: remainingTaskQueue,
+    completedTasks,
+    inventory,
+  };
+};
+
+export const getTaskEffort = (task: Task) => {
+  if (task.type !== "brew") {
+    return 0;
+  }
+  const recipe = recipeMap[task.brewKey];
+  return recipe.effort * parseInt(task.brewSize) * task.quantity;
 };

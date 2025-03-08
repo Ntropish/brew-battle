@@ -2,7 +2,7 @@ import React from "react";
 import { IconButton, Stack, Typography } from "@mui/material";
 
 import EditIcon from "@mui/icons-material/Edit";
-import { BrewKey, BrewSize } from "../../../../data/brew";
+import { BrewKey, BrewSize } from "../../../../../data/brew";
 
 type SellPriceCellProps = {
   value: number;

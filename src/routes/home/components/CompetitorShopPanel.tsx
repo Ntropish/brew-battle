@@ -12,8 +12,8 @@ import {
 import { PotionShop } from "../util/useGameStore"; // Adjust the import based on your file structure
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { BrewKey, BrewSize, recipeMap } from "../../../data/brew";
-import CompetitorBrewTable from "./brew/CompetitorBrewTable";
-import { BrewRow } from "./brew/schema";
+import CompetitorBrewTable from "./tables/brew/CompetitorBrewTable";
+import { BrewRow } from "./tables/brew/schema";
 import ChatMessagesDisplay, { Message } from "./ChatMessagesDisplay";
 import ChatInput from "./ChatInput";
 

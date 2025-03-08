@@ -11,8 +11,8 @@ import {
   BrewSize,
   brewSizeNameMap,
   recipeMap,
-} from "../../../../data/brew";
-import { baseTableConfig } from "../../util/materialReactTable";
+} from "../../../../../data/brew";
+import { baseTableConfig } from "../../../util/materialReactTable";
 import { Button, Tooltip } from "@mui/material";
 
 import SellPriceCell from "./SellPriceCell";
@@ -22,8 +22,8 @@ import {
   EditBrewSellPriceForm,
   editBrewSellPriceFormSchema,
 } from "./schema";
-import useGameStore, { PotionShop } from "../../util/useGameStore";
-import { bottleItemKeyByBrewSize } from "../../../../data/items";
+import useGameStore, { PotionShop } from "../../../util/useGameStore";
+import { bottleItemKeyByBrewSize } from "../../../../../data/items";
 
 type BrewTableProps = {
   data: BrewRow[];

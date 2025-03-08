@@ -6,8 +6,8 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 
-import { BrewSize, brewSizeNameMap } from "../../../../data/brew";
-import { baseTableConfig } from "../../util/materialReactTable";
+import { BrewSize, brewSizeNameMap } from "../../../../../data/brew";
+import { baseTableConfig } from "../../../util/materialReactTable";
 
 import EditBrewSellPriceDialog from "./EditBrewSellPriceDialog";
 import { EditBrewSellPriceForm } from "./schema";

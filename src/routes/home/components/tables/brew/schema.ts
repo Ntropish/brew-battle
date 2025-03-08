@@ -4,7 +4,7 @@ import {
   brewKeySchema,
   BrewSize,
   brewSizeSchema,
-} from "../../../../data/brew";
+} from "../../../../../data/brew";
 
 export const editBrewSellPriceFormSchema = z.object({
   brewKey: brewKeySchema,
